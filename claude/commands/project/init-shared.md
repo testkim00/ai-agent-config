@@ -17,8 +17,7 @@ allowed-tools: Bash(git:*), Bash(npm:*), Bash(bash:*)
 $ARGUMENTS
 
 ## 사전 조건
-- git이 초기화된 프로젝트 폴더에서 실행
-- 최소 1개의 커밋이 있어야 함
+- git 저장소 필요 (없으면 자동으로 `git init` 및 초기 커밋 생성)
 
 ---
 
