@@ -25,6 +25,17 @@ CODEX_NETWORK_MODE: --sandbox danger-full-access
 | `sonnet` | 균형 (기본값) | 대부분의 실행 작업 |
 | `opus` | 고성능 | 복잡한 판단 |
 
+## 역할별 모델 매핑
+
+| 역할 | 모델 | subagent_type |
+|------|------|---------------|
+| Orchestrator | Opus | - (메인) |
+| Setter | Sonnet | Explore |
+| Advisor | Codex | - (외부) |
+| Supervisor | Opus | general-purpose |
+| Executor | Sonnet | general-purpose |
+| Analyzer | Sonnet | general-purpose |
+
 ## 변경 이력
 
 | 날짜 | 변경 |
