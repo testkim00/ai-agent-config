@@ -4,9 +4,20 @@ AI 에이전트(Claude Code, Codex 등)의 공유 설정 저장소
 
 ## 설치
 
+### macOS / Linux
+
 ```bash
-curl -sL https://raw.githubusercontent.com/testkim/ai-agent-config/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/testkim00/ai-agent-config/main/install.sh | bash
 ```
+
+### Windows (PowerShell)
+
+```powershell
+git clone https://github.com/testkim00/ai-agent-config.git $env:USERPROFILE\.ai-agent-config
+& $env:USERPROFILE\.ai-agent-config\install.ps1
+```
+
+> **Note:** 심볼릭 링크 생성을 위해 관리자 권한으로 실행하거나, 개발자 모드를 활성화하세요.
 
 ## 구조
 
@@ -19,9 +30,10 @@ ai-agent-config/
 ├── codex/
 │   ├── skills/           # Codex 스킬
 │   └── AGENTS.md         # Codex 설정
-├── install.sh            # 설치 스크립트
-├── sync.sh               # 원격에서 동기화
-└── push.sh               # 변경사항 푸시
+├── install.sh            # 설치 스크립트 (macOS/Linux)
+├── install.ps1           # 설치 스크립트 (Windows)
+├── sync.sh / sync.ps1    # 원격에서 동기화
+└── push.sh / push.ps1    # 변경사항 푸시
 ```
 
 ## 사용법
@@ -29,15 +41,22 @@ ai-agent-config/
 ### Claude Code에서
 
 ```bash
-/config:sync    # 원격에서 pull
-/config:push    # 변경사항 push
+/config-sync    # 원격에서 pull
+/config-push    # 변경사항 push
 ```
 
-### 터미널에서
+### 터미널에서 (macOS/Linux)
 
 ```bash
 ~/.ai-agent-config/sync.sh   # 동기화
 ~/.ai-agent-config/push.sh   # 푸시
+```
+
+### PowerShell에서 (Windows)
+
+```powershell
+& $env:USERPROFILE\.ai-agent-config\sync.ps1   # 동기화
+& $env:USERPROFILE\.ai-agent-config\push.ps1   # 푸시
 ```
 
 ## 지원 에이전트
