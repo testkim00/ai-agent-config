@@ -110,6 +110,7 @@ $CLAUDE_DIR = Find-AgentDir -AgentName "Claude Code" -Candidates $CLAUDE_CANDIDA
 if ($CLAUDE_DIR) {
     New-ConfigLink -LinkPath "$CLAUDE_DIR\skills" -TargetPath "$CONFIG_DIR\claude\skills" -Name "skills"
     New-ConfigLink -LinkPath "$CLAUDE_DIR\commands" -TargetPath "$CONFIG_DIR\claude\commands" -Name "commands"
+    New-ConfigLink -LinkPath "$CLAUDE_DIR\Claude.md" -TargetPath "$CONFIG_DIR\claude\CLAUDE.md" -Name "Claude.md"
     Write-Host "  Claude Code configured" -ForegroundColor Green
 } else {
     Write-Host "  Skipped." -ForegroundColor Yellow
