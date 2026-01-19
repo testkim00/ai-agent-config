@@ -8,7 +8,7 @@
 ~/.claude/
 ├── commands/  → ~/.ai-agent-config/claude/commands (심볼릭 링크)
 ├── skills/    → ~/.ai-agent-config/claude/skills (심볼릭 링크)
-└── Claude.md  → ~/.ai-agent-config/claude/CLAUDE.md (수동 복사 필요)
+└── Claude.md  → ~/.ai-agent-config/claude/CLAUDE.md (심볼릭 링크)
 
 ~/.ai-agent-config/  → ~/Projects/ai-agent-config (심볼릭 링크)
 └── .git/  (원격: github.com/testkim00/ai-agent-config)
@@ -20,17 +20,9 @@
 |-----------|------|-------------|
 | `commands/` | 심볼릭 링크 | 자동 반영 |
 | `skills/` | 심볼릭 링크 | 자동 반영 |
-| `Claude.md` | 일반 파일 | `sync_claude_md` 호출 |
+| `Claude.md` | 심볼릭 링크 | 자동 반영 |
 
 ## 동기화 함수
-
-### sync_claude_md
-
-CLAUDE.md를 ai-agent-config로 복사:
-
-```bash
-cp ~/.claude/Claude.md ~/.ai-agent-config/claude/CLAUDE.md
-```
 
 ### sync_check
 
@@ -55,9 +47,8 @@ cd ~/.ai-agent-config && git add -A && git commit -m "{메시지}" && git push
 ```markdown
 동기화가 필요한 경우 `~/.claude/skills/sync-config/skill.md` 참조하여 처리:
 
-1. CLAUDE.md 수정 시: `sync_claude_md` 실행
-2. 변경사항 확인: `sync_check` 실행
-3. 원격 푸시: `sync_push` 실행
+1. 변경사항 확인: `sync_check` 실행
+2. 원격 푸시: `sync_push` 실행
 ```
 
 ## 참조하는 커맨드
