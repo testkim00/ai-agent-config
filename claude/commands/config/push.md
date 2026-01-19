@@ -29,3 +29,7 @@ allowed-tools: Bash(git:*)
 
 - 푸시된 파일 목록
 - 성공/실패 여부
+
+## 참조
+
+- 동기화 구조: `~/.claude/skills/sync-config/skill.md`

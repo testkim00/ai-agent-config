@@ -35,20 +35,10 @@
 
 ## 자동 동기화
 
-정리 완료 후 자동으로 `~/.ai-agent-config`에 동기화:
+정리 완료 후 `~/.claude/skills/sync-config/skill.md` 참조하여 동기화 처리.
 
-| 파일 위치 | 동기화 대상 |
-|-----------|-------------|
-| `~/.claude/commands/**` | 심볼릭 링크 (자동 반영) |
-| `~/.claude/skills/**` | 심볼릭 링크 (자동 반영) |
-| `~/.claude/CLAUDE.md` | `~/.ai-agent-config/claude/CLAUDE.md`로 복사 |
-
-```bash
-# CLAUDE.md 동기화
-cp ~/.claude/Claude.md ~/.ai-agent-config/claude/CLAUDE.md
-```
-
-**참고:** commands와 skills는 심볼릭 링크이므로 수정 시 자동 반영됨
+- commands, skills: 심볼릭 링크 (자동 반영)
+- CLAUDE.md: `sync_claude_md` 실행
 
 ## 정리 기준
 
