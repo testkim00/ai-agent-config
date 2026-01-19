@@ -8,7 +8,7 @@
 
 ## 내 정보
 - 직업: 개발자
-- GitHub: testkim
+- GitHub: testkim00
 - 회사: 우리관리(주)
 - 이메일: dtdy87@gmail.com
 

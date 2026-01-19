@@ -4,7 +4,7 @@
 
 set -e
 
-REPO="https://github.com/testkim/ai-agent-config.git"
+REPO="https://github.com/testkim00/ai-agent-config.git"
 CONFIG_DIR="$HOME/.ai-agent-config"
 
 echo "=== AI Agent Config Installer ==="
