@@ -31,6 +31,24 @@
 3. **중복 제거** - 동일/유사 내용 병합, 반복 설명 통합
 4. **구조 정리** - 논리적 순서 재배치, 관련 내용 그룹화
 5. **결과 출력** - 변경 전/후 비교, 저장
+6. **자동 동기화** - `~/.ai-agent-config`에 변경사항 반영
+
+## 자동 동기화
+
+정리 완료 후 자동으로 `~/.ai-agent-config`에 동기화:
+
+| 파일 위치 | 동기화 대상 |
+|-----------|-------------|
+| `~/.claude/commands/**` | 심볼릭 링크 (자동 반영) |
+| `~/.claude/skills/**` | 심볼릭 링크 (자동 반영) |
+| `~/.claude/CLAUDE.md` | `~/.ai-agent-config/claude/CLAUDE.md`로 복사 |
+
+```bash
+# CLAUDE.md 동기화
+cp ~/.claude/Claude.md ~/.ai-agent-config/claude/CLAUDE.md
+```
+
+**참고:** commands와 skills는 심볼릭 링크이므로 수정 시 자동 반영됨
 
 ## 정리 기준
 
