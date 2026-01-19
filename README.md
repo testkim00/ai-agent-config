@@ -66,6 +66,46 @@ ai-agent-config/
 | Claude Code | `~/.claude/` | ✅ |
 | OpenAI Codex | `~/.codex/` | ✅ |
 
+## Claude vs Codex 스킬 시스템
+
+### Claude Code
+
+Claude Code는 두 가지 스킬 시스템을 사용합니다:
+
+| 시스템 | 경로 | 설명 |
+|--------|------|------|
+| **plugins** | `~/.claude/plugins/` | 공식 마켓플레이스에서 설치 (자동 업데이트) |
+| **skills** | `~/.claude/skills/` | 사용자 정의 스킬 |
+| **commands** | `~/.claude/commands/` | 사용자 정의 커맨드 (`/명령어`) |
+
+- `frontend-design`, `document-skills` 등은 **공식 플러그인**으로 제공됨
+- 이 저장소의 `claude/skills`는 사용자 정의 스킬만 포함
+
+### Codex
+
+Codex는 플러그인 마켓플레이스가 없습니다:
+
+| 시스템 | 경로 | 설명 |
+|--------|------|------|
+| **skills** | `~/.codex/skills/` | 모든 스킬 (공식 + 사용자 정의) |
+| **AGENTS.md** | `~/.codex/AGENTS.md` | 에이전트 설정 |
+
+- Codex는 `commands` 폴더를 지원하지 않음
+- 공식 스킬도 직접 `skills/` 폴더에 넣어야 함
+
+### 스킬 공유 구조
+
+```
+ai-agent-config/
+├── claude/
+│   ├── skills/      # 사용자 정의만 (플러그인은 마켓플레이스에서 설치)
+│   └── commands/    # 커맨드 지원
+├── codex/
+│   └── skills/      # 모든 스킬 포함 (플러그인 시스템 없음)
+```
+
+두 에이전트를 모두 사용하는 경우, 각각의 스킬 폴더가 독립적으로 관리됩니다.
+
 ## 경로 안내
 
 에이전트 설정 디렉토리 위치는 OS와 설치 방식에 따라 다를 수 있습니다.
