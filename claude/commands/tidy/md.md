@@ -1,12 +1,12 @@
-# MD Cleanup
+# Tidy MD
 
 마크다운 파일의 중복을 제거하고 내용을 정리합니다.
 
 ## 사용법
 
 ```
-/md-cleanup {파일경로}
-/md-cleanup {파일경로} --dry-run  # 미리보기만
+/tidy-md {파일경로}
+/tidy-md {파일경로} --dry-run  # 미리보기만
 ```
 
 ## 처리 흐름
@@ -46,7 +46,7 @@
 ## 예시
 
 ```bash
-/md-cleanup ~/.claude/skills/subagent-convention/instruction.md
+/tidy-md ~/.claude/skills/subagent-convention/instruction.md
 ```
 
 **출력:**
