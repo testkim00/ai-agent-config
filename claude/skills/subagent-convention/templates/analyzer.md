@@ -69,6 +69,81 @@
 | 3단계 (분석) | 복잡한 의존성, 추가 수집 반복 |
 | 4단계 (실행) | 순차 의존성 과다, 파일 수정 충돌 |
 
+## 병렬 실행 효율성 분석 ⭐ 필수
+
+### 효율성 지표
+
+```
+병렬 효율성 = (순차 실행 시 예상 시간) / (실제 병렬 실행 시간)
+```
+
+| 효율성 | 판정 |
+|--------|------|
+| 2.0x 이상 | 🟢 우수 (병렬화 효과 높음) |
+| 1.5x ~ 2.0x | 🟡 양호 (개선 여지 있음) |
+| 1.5x 미만 | 🔴 미흡 (병렬화 재검토 필요) |
+
+### 분석 항목
+
+1. **병렬 그룹별 효율성**
+   - 각 병렬 그룹의 작업 수, 최소/최대/실제 시간
+   - 작업 간 시간 편차 (편차가 크면 비효율)
+
+2. **병렬화 기회 손실**
+   - 순차로 실행했지만 병렬 가능했던 작업 식별
+   - 의존성 오판으로 인한 불필요한 순차 실행
+
+3. **병렬화 개선 제안**
+   - 더 세분화할 수 있는 작업
+   - 의존성 제거 가능한 작업
+
+## 프로세스 개선 논의 ⭐ 필수
+
+### 논의 대상
+
+실행분석관은 Orchestrator와 다음 항목에 대해 논의합니다:
+
+1. **계획 단계 검토**
+   - 목표 설정이 명확했는가?
+   - 정보 수집 항목이 적절했는가?
+   - 작업 분할이 효율적이었는가?
+
+2. **실행 단계 검토**
+   - 병렬화 전략이 최적이었는가?
+   - 예상치 못한 의존성이 있었는가?
+   - 재작업이 발생했는가?
+
+3. **전반적 프로세스**
+   - 단계 간 정보 전달이 원활했는가?
+   - 불필요한 반복이 있었는가?
+
+### 개선방안 도출
+
+논의 결과 뚜렷한 개선방안이 있으면 사용자에게 제시:
+
+```
+■ 프로세스 개선 제안 (Orchestrator 논의 결과)
+┌─────────────────────────────────────────────────────────────┐
+│ 💡 다음 오케스트레이션에서 적용 가능한 개선방안:              │
+│                                                             │
+│ 1. [즉시 적용] {improvement_1}                              │
+│    - 근거: {reason}                                         │
+│    - 예상 효과: {expected_effect}                           │
+│                                                             │
+│ 2. [검토 필요] {improvement_2}                              │
+│    - 근거: {reason}                                         │
+│    - 주의사항: {caution}                                    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 개선방안 분류
+
+| 분류 | 설명 |
+|------|------|
+| 즉시 적용 | 명확한 효과, 부작용 없음 |
+| 검토 필요 | 효과 예상되나 검증 필요 |
+| 장기 과제 | 구조적 변경 필요, 추후 검토 |
+
 ## JSON 보고서 스키마
 
 ```json
@@ -103,6 +178,46 @@
     { "name": "Supervisor 레벨", "count": 2, "min_seconds": 25, "max_seconds": 35, "actual_seconds": 35 },
     { "name": "Sup.A → Executor", "count": 2, "min_seconds": 15, "max_seconds": 20, "actual_seconds": 20 }
   ],
+  "parallel_efficiency": {
+    "sequential_estimate_seconds": 180,
+    "actual_seconds": 60,
+    "efficiency_ratio": 3.0,
+    "rating": "excellent",
+    "missed_opportunities": [
+      "T3, T4는 병렬 가능했으나 순차 실행됨"
+    ],
+    "improvement_suggestions": [
+      "의존성 재분석으로 T3, T4 병렬화 가능"
+    ]
+  },
+  "process_review": {
+    "planning_phase": {
+      "goal_clarity": "good",
+      "info_collection_adequacy": "good",
+      "task_division_efficiency": "needs_improvement",
+      "feedback": "작업 분할을 더 세분화하면 병렬화 효율 증가"
+    },
+    "execution_phase": {
+      "parallel_strategy": "good",
+      "unexpected_dependencies": false,
+      "rework_occurred": false,
+      "feedback": "실행 단계는 원활했음"
+    },
+    "improvements": [
+      {
+        "priority": "immediate",
+        "description": "Setter 병렬 호출로 정보 수집 시간 단축",
+        "reason": "수집 항목이 독립적이었음",
+        "expected_effect": "2단계 시간 50% 감소"
+      },
+      {
+        "priority": "review_needed",
+        "description": "작업 분할 기준 재정립",
+        "reason": "일부 작업이 너무 커서 병렬화 효과 감소",
+        "caution": "분할이 과도하면 오버헤드 증가"
+      }
+    ]
+  },
   "bottleneck": {
     "stage": 2,
     "name": "정보 수집 (Setter)",
