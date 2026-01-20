@@ -6,11 +6,6 @@
 #   1. 커맨드 수정 시 → 연결된 skills 확인
 #   2. 스킬 수정 시 → 연결된 commands 확인
 #   3. 그룹 내 파일 수정 시 → 같은 그룹의 다른 파일 확인
-#
-# 그룹핑은 디렉토리 구조로 자동 추론:
-#   commands/git/*.md → git 그룹
-#   commands/db/*.md → db 그룹
-#   등등
 
 relations:
   # Git 관련
@@ -38,32 +33,56 @@ relations:
     skills: ["dooray"]
     description: "Dooray 메신저 연동"
 
-  # Tidy
+  # Tidy (스킬 없음 - 커맨드 자체 참조)
   - commands: ["tidy/*"]
-    skills: ["tidy"]
+    skills: []
     description: "파일 정리 명령어 (md, meta)"
+    shared: ["tidy/_common.md"]
+
+  # Codex/Consult (독립 커맨드)
+  - commands: ["codex.md", "consult.md"]
+    skills: []
+    description: "Codex 자문 명령어"
+
+  # Project 관련
+  - commands: ["project/*"]
+    skills: []
+    description: "프로젝트 초기화, 공유 모듈 관리"
+
+  # 기타 독립 커맨드
+  - commands: ["fix-encoding.md"]
+    skills: []
+    description: "터미널 한글 인코딩 설정"
 
 # 그룹 내 공유 파일 (해당 그룹 수정 시 함께 확인)
 shared_files:
   tidy:
-    - "_common.md"  # 모든 tidy 커맨드에 적용되는 공통 규칙
+    - "_common.md"
 
 # 전역 참조 (모든 수정 시 고려)
 global:
-  - "CLAUDE.md"  # 전역 설정
+  - "CLAUDE.md"
+  - "_relations.yaml"
 
 # 스킬 내부 구조 (스킬 수정 시 함께 확인해야 할 파일들)
 skill_internals:
   subagent-convention:
-    - "instruction.md"      # 핵심 흐름
-    - "config.md"           # 모델 설정
-    - "templates/*.md"      # 역할별 템플릿
+    - "_index.md"
+    - "instruction.md"
+    - "config.md"
+    - "templates/*.md"
 
   db-query:
-    - "skill.md"            # 실행 가이드
-    - "databases.md"        # DB 연결 정보
-    - "templates.md"        # 쿼리 템플릿
-    - "schema/*.md"         # 테이블 스키마
+    - "skill.md"
+    - "databases.md"
+    - "templates.md"
+    - "schema/*.md"
 
   git-convention:
-    - "SKILL.md"            # 컨벤션 정의
+    - "SKILL.md"
+
+  dooray:
+    - "skill.md"
+
+  sync-config:
+    - "skill.md"
