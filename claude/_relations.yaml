@@ -38,6 +38,11 @@ relations:
     skills: ["dooray"]
     description: "Dooray 메신저 연동"
 
+  # Tidy
+  - commands: ["tidy/*"]
+    skills: ["tidy"]
+    description: "파일 정리 명령어 (md, meta)"
+
 # 그룹 내 공유 파일 (해당 그룹 수정 시 함께 확인)
 shared_files:
   tidy:
