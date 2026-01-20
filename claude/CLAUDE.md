@@ -79,31 +79,53 @@
 | 코드 분석/탐색 | |
 | 새 파일 작성 | |
 
-## 문서 수정 규칙
+## 명령어 실행 규칙
 
-> **⚠️ 커맨드/스킬 수정 시:**
->
-> `~/.claude/_relations.yaml` 확인 → 관련 문서 함께 수정
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ⚠️ 모든 명령어(/command) 실행 전 필수:                       │
+│                                                             │
+│ 1. ~/.claude/_relations.yaml 확인                           │
+│ 2. 해당 명령어와 연결된 skills 파일 전부 읽기                │
+│ 3. skill_internals에 정의된 내부 파일도 확인                 │
+│ 4. 모든 관련 문서 확인 후 명령 수행                          │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ### 관계 파일 (`_relations.yaml`)
 
 ```yaml
 relations:
-  - commands: ["git/*"]
-    skills: ["git-convention"]
-  - commands: ["db/*"]
-    skills: ["db-query"]
   - commands: ["orchestration.md"]
     skills: ["subagent-convention"]
+  - commands: ["git/*"]
+    skills: ["git-convention"]
   # ...
+
+skill_internals:
+  subagent-convention:
+    - "instruction.md"
+    - "config.md"
+    - "templates/*.md"
 ```
 
-### 수정 워크플로우
+### 실행 워크플로우
 
 ```
-커맨드 수정 시 → _relations.yaml에서 연결된 skills 확인
-스킬 수정 시 → _relations.yaml에서 연결된 commands 확인
-그룹 내 수정 시 → 같은 디렉토리의 다른 파일 확인
+1. 명령어 실행 요청 받음
+2. _relations.yaml에서 해당 명령어 찾기
+3. 연결된 skills 확인
+4. skill_internals에서 내부 파일 목록 확인
+5. 관련 파일 전부 읽기
+6. 명령 수행
+```
+
+### 문서 수정 시
+
+```
+커맨드 수정 → 연결된 skills도 함께 수정
+스킬 수정 → 연결된 commands도 함께 수정
+그룹 내 수정 → 같은 디렉토리 파일 확인
 ```
 
 ## 위임 체계
