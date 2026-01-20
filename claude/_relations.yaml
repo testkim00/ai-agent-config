@@ -1,0 +1,64 @@
+# 커맨드-스킬 관계 정의
+#
+# 문서 수정 시 이 파일을 참조하여 관련 문서를 함께 확인/수정
+#
+# 사용법:
+#   1. 커맨드 수정 시 → 연결된 skills 확인
+#   2. 스킬 수정 시 → 연결된 commands 확인
+#   3. 그룹 내 파일 수정 시 → 같은 그룹의 다른 파일 확인
+#
+# 그룹핑은 디렉토리 구조로 자동 추론:
+#   commands/git/*.md → git 그룹
+#   commands/db/*.md → db 그룹
+#   등등
+
+relations:
+  # Git 관련
+  - commands: ["git/*"]
+    skills: ["git-convention"]
+    description: "커밋 메시지, 브랜치명 규칙"
+
+  # DB 관련
+  - commands: ["db/*"]
+    skills: ["db-query"]
+    description: "쿼리 실행, 스키마, 템플릿"
+
+  # 오케스트레이션
+  - commands: ["orchestration.md"]
+    skills: ["subagent-convention"]
+    description: "5단계 흐름, 위임 체계, 템플릿"
+
+  # 설정 동기화
+  - commands: ["config/*"]
+    skills: ["sync-config"]
+    description: "설정 파일 동기화"
+
+  # Dooray
+  - commands: ["dooray/*"]
+    skills: ["dooray"]
+    description: "Dooray 메신저 연동"
+
+# 그룹 내 공유 파일 (해당 그룹 수정 시 함께 확인)
+shared_files:
+  tidy:
+    - "_common.md"  # 모든 tidy 커맨드에 적용되는 공통 규칙
+
+# 전역 참조 (모든 수정 시 고려)
+global:
+  - "CLAUDE.md"  # 전역 설정
+
+# 스킬 내부 구조 (스킬 수정 시 함께 확인해야 할 파일들)
+skill_internals:
+  subagent-convention:
+    - "instruction.md"      # 핵심 흐름
+    - "config.md"           # 모델 설정
+    - "templates/*.md"      # 역할별 템플릿
+
+  db-query:
+    - "skill.md"            # 실행 가이드
+    - "databases.md"        # DB 연결 정보
+    - "templates.md"        # 쿼리 템플릿
+    - "schema/*.md"         # 테이블 스키마
+
+  git-convention:
+    - "SKILL.md"            # 컨벤션 정의

@@ -79,38 +79,32 @@
 | 코드 분석/탐색 | |
 | 새 파일 작성 | |
 
-## 문서 수정 규칙 (메타 인덱스)
+## 문서 수정 규칙
 
-> **⚠️ MD 파일, 스킬, 커맨드 수정 시 필수:**
+> **⚠️ 커맨드/스킬 수정 시:**
 >
-> 1. `~/.claude/_index.md` 에서 해당 그룹의 `_index.md` 확인
-> 2. 관련 문서 목록 파악
-> 3. 모든 관련 문서에 일관성 있게 수정
+> `~/.claude/_relations.yaml` 확인 → 관련 문서 함께 수정
 
-### 메타 인덱스 구조
+### 관계 파일 (`_relations.yaml`)
 
-| 경로 | 용도 |
-|------|------|
-| `~/.claude/_index.md` | 마스터 인덱스 |
-| `commands/_index.md` | 커맨드 인덱스 |
-| `commands/{group}/_index.md` | 그룹별 커맨드 인덱스 |
-| `skills/_index.md` | 스킬 인덱스 |
-| `skills/{skill}/_index.md` | 스킬별 인덱스 |
+```yaml
+relations:
+  - commands: ["git/*"]
+    skills: ["git-convention"]
+  - commands: ["db/*"]
+    skills: ["db-query"]
+  - commands: ["orchestration.md"]
+    skills: ["subagent-convention"]
+  # ...
+```
 
 ### 수정 워크플로우
 
 ```
-1. 수정할 파일이 속한 그룹의 _index.md 읽기
-2. 관련 문서 목록 확인
-3. 필요 시 관련 문서도 함께 수정
-4. _index.md 업데이트 (문서 추가/삭제 시)
+커맨드 수정 시 → _relations.yaml에서 연결된 skills 확인
+스킬 수정 시 → _relations.yaml에서 연결된 commands 확인
+그룹 내 수정 시 → 같은 디렉토리의 다른 파일 확인
 ```
-
-### 참조 관계
-
-- 커맨드 → 스킬: 커맨드가 스킬을 참조하면 양쪽 `_index.md`에 명시
-- 스킬 → 커맨드: 스킬 수정 시 관련 커맨드도 확인
-- 공통 규칙 변경: 모든 관련 문서에 반영
 
 ## 위임 체계
 
