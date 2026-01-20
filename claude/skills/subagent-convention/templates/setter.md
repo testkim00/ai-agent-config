@@ -2,6 +2,8 @@
 
 오케스트레이터가 계획 수립에 필요한 정보를 수집하는 템플릿입니다.
 
+> **참고:** 수집 항목이 3개 이상이고 독립적인 경우, Orchestrator는 여러 Setter를 병렬로 호출할 수 있습니다.
+
 ## Task 호출
 
 ```python
@@ -16,7 +18,7 @@ Task(
     1. 관련 파일 경로
     2. 참고할 기존 코드/패턴
     3. API 엔드포인트 (해당 시)
-    4. 의존성 관계
+    4. 파일별 import 문 (raw data)
     5. 수정 대상 파일
 
     [탐색 범위]
@@ -41,6 +43,11 @@ Task(
     | 메서드 | 경로 | 설명 |
     |--------|------|------|
     | {GET/POST} | {경로} | {설명} |
+
+    ## Import 문 (raw data)
+    | 파일 | import 문 |
+    |------|-----------|
+    | {파일경로} | {import/require 문 그대로} |
 
     ## 의존성
     - {A} → {B}: {관계 설명}
@@ -72,6 +79,12 @@ Task(
 | 메서드 | 경로 | 설명 |
 |--------|------|------|
 | POST | /api/user/login | 기존 로그인 (참고) |
+
+## Import 문 (raw data)
+| 파일 | import 문 |
+|------|-----------|
+| src/api/base.ts | `import { UserModel } from '../models/user'` |
+| src/middleware/index.ts | `import { logger } from './logger'` |
 
 ## 의존성
 - auth 모듈 → user 모델: 사용자 정보 참조
