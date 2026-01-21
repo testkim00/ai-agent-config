@@ -24,14 +24,19 @@
 │        ├ 2-1. 템플릿 저장소 clone                                    │
 │        ├ 2-2. .git 폴더 제거 (새 저장소로 시작)                       │
 │        ├ 2-3. 프로젝트 파일 수정 (템플릿 타입에 따라)                  │
-│        │      - Vue: package.json 수정 → npm install                │
-│        │      - .NET: .csproj/.sln 수정 → dotnet restore            │
 │        └ 2-4. 의존성 설치                                           │
 ├─────────────────────────────────────────────────────────────────────┤
-│ 3단계: 초기화 완료                                                   │
-│        ├ 3-1. 프로젝트 정보 표시                                     │
-│        ├ 3-2. 다음 단계 안내                                         │
-│        └ 3-3. 개발 서버 실행 여부 확인                                │
+│ 3단계: Shared 모듈 연결 (src/_shared 존재 시)                        │
+│        ├ 3-1. git init (새 저장소 초기화)                            │
+│        ├ 3-2. 초기 커밋 생성                                         │
+│        ├ 3-3. src/_shared 폴더 삭제                                  │
+│        ├ 3-4. subtree add로 각 모듈 연결                             │
+│        └ (src/_shared 없으면 이 단계 건너뜀)                         │
+├─────────────────────────────────────────────────────────────────────┤
+│ 4단계: 초기화 완료                                                   │
+│        ├ 4-1. 프로젝트 정보 표시                                     │
+│        ├ 4-2. 다음 단계 안내                                         │
+│        └ 4-3. 개발 서버 실행 여부 확인                                │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -103,21 +108,61 @@ dotnet restore
 
 ---
 
-### 3단계: 초기화 완료
+### 3단계: Shared 모듈 연결 (NEW!)
 
-**다음 단계 안내 (Vue/Quasar):**
+**src/_shared 폴더가 존재하는 경우에만 실행:**
+
+```bash
+# 1. src/_shared 존재 확인
+if [ -d "src/_shared" ]; then
+
+  # 2. git 초기화 및 초기 커밋
+  git init
+  git add .
+  git commit -m "초기 커밋: 프로젝트 템플릿 생성"
+
+  # 3. 기존 _shared 폴더 삭제
+  rm -rf src/_shared
+  git add -A
+  git commit -m "chore: _shared 폴더 제거 (subtree 연결 준비)"
+
+  # 4. subtree로 각 모듈 연결
+  git subtree add --prefix=src/_shared/ui-shell https://github.com/testkim00/ui-shell.git main --squash
+  git subtree add --prefix=src/_shared/components https://github.com/testkim00/ui-components.git main --squash
+  git subtree add --prefix=src/_shared/core https://github.com/testkim00/core-lib.git main --squash
+
+fi
+```
+
+**src/_shared 폴더가 없으면:**
+- 이 단계 건너뜀
+- 일반 프로젝트로 진행
+
+---
+
+### 4단계: 초기화 완료
+
+**다음 단계 안내 (Vue/Quasar + Shared 연결됨):**
 
 ```
 ✅ 프로젝트 생성 완료!
 
+📦 Shared 모듈 연결됨:
+  - ui-shell (subtree)
+  - components (subtree)
+  - core (subtree)
+
 다음 단계:
 1. cd {프로젝트명}
 2. quasar dev        # 개발 서버 시작
-3. quasar build      # 프로덕션 빌드
 
-Git 초기화:
-- git init
+Shared 모듈 관리:
+- /shared:pull       # 최신 버전 가져오기
+- /shared:push       # 변경사항 푸시
+
+Git 원격 저장소 연결:
 - git remote add origin <your-repo-url>
+- git push -u origin main
 ```
 
 **다음 단계 안내 (.NET):**
@@ -146,12 +191,14 @@ Git 초기화:
   "erp-starter": {
     "repo": "https://github.com/testkim00/erp-starter",
     "desc": "ERP 클라이언트 템플릿 (Quasar + Vue3)",
-    "tags": ["quasar", "vue3", "erp", "pinia"]
+    "tags": ["quasar", "vue3", "erp", "pinia"],
+    "hasShared": true
   },
   "api-boilerplate": {
     "repo": "https://github.com/testkim00/api-boilerplate",
     "desc": "API 서버 템플릿 (.NET 10)",
-    "tags": ["dotnet", "net10", "api", "efcore"]
+    "tags": ["dotnet", "net10", "api", "efcore"],
+    "hasShared": false
   }
 }
 ```
@@ -160,7 +207,7 @@ Git 초기화:
 
 ## 예시
 
-### erp-starter 템플릿
+### erp-starter 템플릿 (Shared 연결 포함)
 
 ```
 /project:new erp-starter
@@ -173,18 +220,33 @@ Git 초기화:
   ✓ .git 제거
   ✓ package.json 수정
   ✓ npm install 완료
+  ✓ git init
+  ✓ 초기 커밋 생성
+  ✓ _shared 폴더 제거
+  ✓ ui-shell subtree 연결
+  ✓ components subtree 연결
+  ✓ core subtree 연결
 
 → ✅ 프로젝트 생성 완료!
+
+  📦 Shared 모듈 연결됨:
+    - ui-shell
+    - components
+    - core
 
   다음 단계:
   1. cd MyErpClient
   2. quasar dev
 
+  Shared 모듈 관리:
+  - /shared:pull  # 최신 버전 가져오기
+  - /shared:push  # 변경사항 푸시
+
 → "지금 quasar dev를 실행할까요?"
   ● Yes
 ```
 
-### api-boilerplate 템플릿
+### api-boilerplate 템플릿 (Shared 없음)
 
 ```
 /project:new api-boilerplate
@@ -214,6 +276,6 @@ Git 초기화:
 
 | 명령어 | 설명 |
 |--------|------|
-| `/project:init-shared` | 기존 프로젝트에 _shared 추가 |
-| `/project:sync-shared` | _shared 최신화 |
-| `/project:push-shared` | _shared 변경 푸시 |
+| `/shared:init` | 기존 프로젝트에 _shared 수동 추가 |
+| `/shared:pull` | _shared 최신화 |
+| `/shared:push` | _shared 변경 푸시 |

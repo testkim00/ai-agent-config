@@ -8,10 +8,15 @@
 #   3. 그룹 내 파일 수정 시 → 같은 그룹의 다른 파일 확인
 
 relations:
-  # Git 관련
+  # Git 관련 (순수 git workflow)
   - commands: ["git/*"]
     skills: ["git-convention"]
     description: "커밋 메시지, 브랜치명 규칙"
+
+  # Shared 모듈 관련 (공유 모듈 subtree 관리)
+  - commands: ["shared/*"]
+    skills: []
+    description: "공유 모듈 push/pull/init (subtree)"
 
   # DB 관련
   - commands: ["db/*"]
@@ -44,10 +49,10 @@ relations:
     skills: []
     description: "Codex 자문 명령어"
 
-  # Project 관련
+  # Project 관련 (프로젝트 생성만)
   - commands: ["project/*"]
     skills: []
-    description: "프로젝트 초기화, 공유 모듈 관리"
+    description: "프로젝트 생성"
 
   # 기타 독립 커맨드
   - commands: ["fix-encoding.md"]
