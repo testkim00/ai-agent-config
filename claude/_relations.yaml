@@ -23,6 +23,11 @@ relations:
     skills: ["db-query"]
     description: "쿼리 실행, 스키마, 템플릿"
 
+  # 환경변수 관련 (DB 접속정보, API 토큰)
+  - commands: ["env/*"]
+    skills: []
+    description: "환경변수 추가/조회/삭제"
+
   # 오케스트레이션
   - commands: ["orchestration.md"]
     skills: ["subagent-convention"]
