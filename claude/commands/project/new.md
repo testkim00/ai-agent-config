@@ -5,9 +5,10 @@
 ## 사용법
 
 ```
-/project:new              # 템플릿 선택 후 생성
-/project:new erp          # erp-starter 템플릿으로 생성
-/project:new <url>        # 커스텀 URL에서 생성
+/project:new                    # 템플릿 선택 후 생성
+/project:new erp-starter        # ERP 클라이언트 템플릿 (Vue3)
+/project:new api-boilerplate    # API 서버 템플릿 (.NET 10)
+/project:new <url>              # 커스텀 URL에서 생성
 ```
 
 ## 처리 흐름
@@ -22,13 +23,15 @@
 │ 2단계: 프로젝트 생성                                                 │
 │        ├ 2-1. 템플릿 저장소 clone                                    │
 │        ├ 2-2. .git 폴더 제거 (새 저장소로 시작)                       │
-│        ├ 2-3. package.json 프로젝트명 수정                           │
-│        └ 2-4. npm install                                           │
+│        ├ 2-3. 프로젝트 파일 수정 (템플릿 타입에 따라)                  │
+│        │      - Vue: package.json 수정 → npm install                │
+│        │      - .NET: .csproj/.sln 수정 → dotnet restore            │
+│        └ 2-4. 의존성 설치                                           │
 ├─────────────────────────────────────────────────────────────────────┤
 │ 3단계: 초기화 완료                                                   │
-│        ├ 3-1. _shared 버전 정보 표시                                 │
+│        ├ 3-1. 프로젝트 정보 표시                                     │
 │        ├ 3-2. 다음 단계 안내                                         │
-│        └ 3-3. quasar dev 실행 여부 확인                              │
+│        └ 3-3. 개발 서버 실행 여부 확인                                │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -44,35 +47,41 @@
 
 ```
 "어떤 템플릿을 사용할까요?"
-  ○ erp - ERP 클라이언트 템플릿 (Quasar + Vue3)
-  ○ admin - 관리자 포털 템플릿
+  ○ erp-starter - ERP 클라이언트 템플릿 (Quasar + Vue3)
+  ○ api-boilerplate - API 서버 템플릿 (.NET 10)
   ○ Other (직접 입력)
 ```
 
 **인자가 있는 경우:**
 
-- `erp`, `admin` 등 → boilerplates.json에서 URL 조회
+- `erp-starter`, `api-boilerplate` 등 → boilerplates.json에서 URL 조회
 - `https://...` → 직접 URL 사용
 
 **프로젝트 이름 입력:**
 
 ```
 "프로젝트 이름을 입력하세요 (폴더명):"
-→ my-erp-project
+→ MyNewProject
 ```
 
 ---
 
 ### 2단계: 프로젝트 생성
 
+**공통:**
+
 ```bash
 # 1. Clone
-git clone https://github.com/testkim00/erp-starter.git {프로젝트명}
+git clone {repo_url} {프로젝트명}
 
 # 2. .git 제거 (새 저장소로 시작)
 cd {프로젝트명}
 rm -rf .git
+```
 
+**Vue/Quasar 프로젝트 (erp-starter):**
+
+```bash
 # 3. package.json 수정
 # name, productName 등을 프로젝트명으로 변경
 
@@ -80,24 +89,23 @@ rm -rf .git
 npm install
 ```
 
+**.NET 프로젝트 (api-boilerplate):**
+
+```bash
+# 3. .csproj, .sln 파일명 및 내용 수정
+mv *.csproj {프로젝트명}.csproj
+mv *.sln {프로젝트명}.sln
+# .sln 파일 내 프로젝트 참조 수정
+
+# 4. dotnet restore
+dotnet restore
+```
+
 ---
 
 ### 3단계: 초기화 완료
 
-**_shared 버전 정보 표시:**
-
-`_shared-version.json` 파일 읽어서 표시:
-
-```
-■ _shared 모듈 버전
-┌─────────────────────────────────────────────────────────────┐
-│ ui-shell:   v1.0.0 (13e8582e)                               │
-│ components: v1.0.0 (dcab6f15)                               │
-│ core:       v1.0.0 (d3b0e6bd)                               │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**다음 단계 안내:**
+**다음 단계 안내 (Vue/Quasar):**
 
 ```
 ✅ 프로젝트 생성 완료!
@@ -107,8 +115,20 @@ npm install
 2. quasar dev        # 개발 서버 시작
 3. quasar build      # 프로덕션 빌드
 
-_shared 모듈 업데이트:
-- /project:sync-shared  # 최신 버전으로 동기화
+Git 초기화:
+- git init
+- git remote add origin <your-repo-url>
+```
+
+**다음 단계 안내 (.NET):**
+
+```
+✅ 프로젝트 생성 완료!
+
+다음 단계:
+1. cd {프로젝트명}
+2. dotnet run        # 개발 서버 시작
+3. dotnet build      # 빌드
 
 Git 초기화:
 - git init
@@ -123,15 +143,15 @@ Git 초기화:
 
 ```json
 {
-  "erp": {
+  "erp-starter": {
     "repo": "https://github.com/testkim00/erp-starter",
     "desc": "ERP 클라이언트 템플릿 (Quasar + Vue3)",
-    "tags": ["quasar", "vue3", "erp"]
+    "tags": ["quasar", "vue3", "erp", "pinia"]
   },
-  "admin": {
-    "repo": "https://github.com/testkim00/admin-starter",
-    "desc": "관리자 포털 템플릿",
-    "tags": ["quasar", "vue3", "admin"]
+  "api-boilerplate": {
+    "repo": "https://github.com/testkim00/api-boilerplate",
+    "desc": "API 서버 템플릿 (.NET 10)",
+    "tags": ["dotnet", "net10", "api", "efcore"]
   }
 }
 ```
@@ -140,14 +160,13 @@ Git 초기화:
 
 ## 예시
 
-```
-/project:new
+### erp-starter 템플릿
 
-→ "어떤 템플릿을 사용할까요?"
-  ● erp - ERP 클라이언트 템플릿 (Quasar + Vue3)
+```
+/project:new erp-starter
 
 → "프로젝트 이름을 입력하세요:"
-  my-new-erp
+  MyErpClient
 
 → [실행 중...]
   ✓ 템플릿 clone 완료
@@ -157,17 +176,36 @@ Git 초기화:
 
 → ✅ 프로젝트 생성 완료!
 
-  ■ _shared 모듈 버전
-  │ ui-shell:   v1.0.0 (13e8582e)
-  │ components: v1.0.0 (dcab6f15)
-  │ core:       v1.0.0 (d3b0e6bd)
-
   다음 단계:
-  1. cd my-new-erp
+  1. cd MyErpClient
   2. quasar dev
 
 → "지금 quasar dev를 실행할까요?"
   ● Yes
+```
+
+### api-boilerplate 템플릿
+
+```
+/project:new api-boilerplate
+
+→ "프로젝트 이름을 입력하세요:"
+  MyApiServer
+
+→ [실행 중...]
+  ✓ 템플릿 clone 완료
+  ✓ .git 제거
+  ✓ .csproj/.sln 수정
+  ✓ dotnet restore 완료
+
+→ ✅ 프로젝트 생성 완료!
+
+  다음 단계:
+  1. cd MyApiServer
+  2. dotnet run
+
+→ "지금 dotnet run을 실행할까요?"
+  ● No
 ```
 
 ---

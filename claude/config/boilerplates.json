@@ -1,0 +1,12 @@
+{
+  "erp-starter": {
+    "repo": "https://github.com/testkim00/erp-starter",
+    "desc": "ERP 클라이언트 템플릿 (Quasar + Vue3)",
+    "tags": ["quasar", "vue3", "erp", "pinia"]
+  },
+  "api-boilerplate": {
+    "repo": "https://github.com/testkim00/api-boilerplate",
+    "desc": "API 서버 템플릿 (.NET 10)",
+    "tags": ["dotnet", "net10", "api", "efcore"]
+  }
+}
