@@ -33,6 +33,11 @@ relations:
     skills: ["subagent-convention"]
     description: "5단계 흐름, 위임 체계, 템플릿"
 
+  # 오케스트레이션 분석
+  - commands: ["analyze/orchestration.md"]
+    skills: ["subagent-convention"]
+    description: "보고서 분석, 패턴 추출, 학습 규칙 업데이트"
+
   # 설정 동기화
   - commands: ["config/*"]
     skills: ["sync-config"]

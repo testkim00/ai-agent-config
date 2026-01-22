@@ -8,10 +8,29 @@
 │                                                             │
 │ 1. _index.md 확인 (관련 문서 파악)                          │
 │ 2. 이 파일(instruction.md) 읽기                             │
-│ 3. 1단계 시작과 동시에 시간 기록 시작                        │
+│ 3. 학습 규칙 확인 (아래 참조)                               │
+│ 4. 1단계 시작과 동시에 시간 기록 시작                        │
 │    [TIME] 1.0 | START | {timestamp} | 1단계: 요청 분석 시작 │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+### 학습 규칙 적용 (3번 항목)
+
+오케스트레이션 시작 시 `~/.claude/orchestration/memory/learnings.json`을 읽고:
+
+1. **조건 맞는 규칙 확인**: `trigger.condition`이 현재 작업과 일치하는 규칙 필터링
+2. **규칙 적용**: 해당 `action`을 실행 계획에 반영
+3. **우선순위 고려**: `priority: high` 규칙 우선 적용
+
+```
+예시: 리팩토링 작업 시
+├─ rule-001: 병렬 Setter 활용 (setter_items >= 3)
+├─ rule-002: 빌드 검증 필수 (task_type == 'refactoring')
+├─ rule-003: 미사용 파일 정리 (task_type == 'refactoring')
+└─ rule-004: console.log 정리 (task_type == 'refactoring' AND file_type == 'vue')
+```
+
+학습 규칙이 없거나 파일이 없으면 기본 흐름대로 진행.
 
 ## 완료 조건
 
@@ -262,11 +281,18 @@ T1, T2 (병렬) → T3 (순차) → T4, T5 (병렬)
 - 콘솔 보고서: [templates/execution-report.md](./templates/execution-report.md)
 - JSON 스키마: [templates/analyzer.md](./templates/analyzer.md)
 
+### 학습 규칙 업데이트 (권장)
+
+보고서 저장 후 `/analyze:orchestration` 실행을 권장합니다:
+- 새로운 패턴 추출 → `insights/patterns.json` 업데이트
+- 반복 패턴 → `memory/learnings.json`에 규칙으로 승격
+- 다음 오케스트레이션에서 자동 적용
+
 ---
 
 ## 핵심 원칙
 
-1. **오케스트레이션 시작 시 반드시 `_index.md` → `instruction.md` 읽기**
+1. **오케스트레이션 시작 시 반드시 `_index.md` → `instruction.md` → `learnings.json` 읽기**
 2. Orchestrator는 Setter 호출 전에 먼저 요청 분석 및 목표 설정
 3. Setter는 **수집 + 역할 설명**, 깊은 분석은 Orchestrator가 수행
 4. 정보 부족 시 Setter 반복 호출
@@ -277,6 +303,7 @@ T1, T2 (병렬) → T3 (순차) → T4, T5 (병렬)
 9. **1단계 시작부터 모든 단계/작업의 시간을 기록**
 10. **5단계 실행 분석 보고 완료 전까지 오케스트레이션 미완료**
 11. **5단계에서 반드시 콘솔 보고서 출력 + JSON 저장**
+12. **학습 규칙(`learnings.json`)의 조건이 맞으면 해당 action 적용**
 
 ---
 
