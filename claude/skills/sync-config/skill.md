@@ -1,26 +1,48 @@
 # Sync Config Skill
 
-`~/.claude`와 `~/.ai-agent-config` 간의 동기화를 담당하는 공통 모듈입니다.
+`~/.claude`, `~/.codex`와 `~/.ai-agent-config` 간의 동기화를 담당하는 공통 모듈입니다.
 
 ## 디렉토리 구조
 
 ```
+~/.ai-agent-config/  → ~/Projects/ai-agent-config (git 저장소)
+├── .git/  (원격: github.com/testkim00/ai-agent-config)
+├── claude/
+│   ├── commands/
+│   ├── skills/
+│   └── CLAUDE.md
+└── codex/
+    ├── skills/
+    └── AGENTS.md
+
 ~/.claude/
 ├── commands/  → ~/.ai-agent-config/claude/commands (심볼릭 링크)
 ├── skills/    → ~/.ai-agent-config/claude/skills (심볼릭 링크)
-└── Claude.md  → ~/.ai-agent-config/claude/CLAUDE.md (심볼릭 링크)
+└── CLAUDE.md  → ~/.ai-agent-config/claude/CLAUDE.md (심볼릭 링크)
 
-~/.ai-agent-config/  → ~/Projects/ai-agent-config (심볼릭 링크)
-└── .git/  (원격: github.com/testkim00/ai-agent-config)
+~/.codex/
+├── skills/    → ~/.ai-agent-config/codex/skills (심볼릭 링크)
+└── AGENTS.md  → ~/.ai-agent-config/codex/AGENTS.md (심볼릭 링크)
 ```
 
 ## 동기화 대상
+
+### Claude
 
 | 파일/폴더 | 유형 | 동기화 방법 |
 |-----------|------|-------------|
 | `commands/` | 심볼릭 링크 | 자동 반영 |
 | `skills/` | 심볼릭 링크 | 자동 반영 |
-| `Claude.md` | 심볼릭 링크 | 자동 반영 |
+| `CLAUDE.md` | 심볼릭 링크 | 자동 반영 |
+
+### Codex
+
+| 파일/폴더 | 유형 | 동기화 방법 |
+|-----------|------|-------------|
+| `skills/` | 심볼릭 링크 | 자동 반영 |
+| `AGENTS.md` | 심볼릭 링크 | 자동 반영 |
+
+> **AGENTS.md**: Codex가 스킬을 참조하도록 안내하는 전역 지침 파일
 
 ## 동기화 함수
 

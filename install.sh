@@ -41,9 +41,11 @@ if [ -d "$HOME/.codex" ]; then
 
     # Backup existing
     [ -d "$HOME/.codex/skills" ] && [ ! -L "$HOME/.codex/skills" ] && mv "$HOME/.codex/skills" "$HOME/.codex/skills.bak"
+    [ -f "$HOME/.codex/AGENTS.md" ] && [ ! -L "$HOME/.codex/AGENTS.md" ] && mv "$HOME/.codex/AGENTS.md" "$HOME/.codex/AGENTS.md.bak"
 
     # Create symlinks
     ln -sf "$CONFIG_DIR/codex/skills" "$HOME/.codex/skills"
+    ln -sf "$CONFIG_DIR/codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
 
     echo "  ✓ Codex configured"
 fi
