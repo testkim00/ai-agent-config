@@ -27,8 +27,9 @@ $ARGUMENTS
 
 1. 현재 프로젝트 상태 표시
 2. git 저장소 존재 확인 (없으면 생성)
-3. "공유 모듈을 이 프로젝트에 추가하시겠습니까?" 확인
-4. 사용자 승인 후 진행
+3. 기존 `src/_shared/_version.json` 존재 여부 확인
+4. "공유 모듈을 이 프로젝트에 추가하시겠습니까?" 확인
+5. 사용자 승인 후 진행
 
 ## Phase 2: Subtree Add
 
@@ -49,7 +50,45 @@ git subtree add --prefix=src/_shared/components https://github.com/testkim00/ui-
 git subtree add --prefix=src/_shared/core https://github.com/testkim00/core-lib.git main --squash
 ```
 
-## Phase 3: 초기화 (ui-shell 포함 시)
+## Phase 3: 버전 파일 생성
+
+1. 각 모듈별 원격 커밋 조회: `git ls-remote {원격URL} main`
+2. `src/_shared/_version.json` 생성:
+
+```json
+{
+  "version": "1.0.0",
+  "lastSync": "{현재시간 ISO 8601}",
+  "modules": {
+    "ui-shell": {
+      "remote": "https://github.com/testkim00/ui-shell.git",
+      "branch": "main",
+      "commit": "{원격 커밋 해시}",
+      "localModified": false
+    },
+    "components": {
+      "remote": "https://github.com/testkim00/ui-components.git",
+      "branch": "main",
+      "commit": "{원격 커밋 해시}",
+      "localModified": false
+    },
+    "core": {
+      "remote": "https://github.com/testkim00/core-lib.git",
+      "branch": "main",
+      "commit": "{원격 커밋 해시}",
+      "localModified": false
+    }
+  }
+}
+```
+
+3. 버전 파일 커밋:
+```bash
+git add src/_shared/_version.json
+git commit -m "chore: 공유 모듈 버전 파일 생성"
+```
+
+## Phase 4: 초기화 (ui-shell 포함 시)
 
 ```bash
 # 초기화 스크립트 실행
@@ -59,7 +98,15 @@ bash src/_shared/ui-shell/init-project.sh
 npm install
 ```
 
-## Phase 4: 완료 안내
+## Phase 5: 완료 안내
+
+버전 정보 표시:
+
+| 모듈 | 버전 | 원격 저장소 |
+|------|------|------------|
+| ui-shell | (커밋 앞 7자리) | github.com/testkim00/ui-shell |
+| components | (커밋 앞 7자리) | github.com/testkim00/ui-components |
+| core | (커밋 앞 7자리) | github.com/testkim00/core-lib |
 
 다음 단계 안내:
 - package.json에서 name, description 수정

@@ -20,14 +20,28 @@ $ARGUMENTS
 
 # 처리 흐름
 
-## Phase 1: 사전 확인
+## Phase 1: 버전 확인
 
-1. 현재 상태 표시
-2. 커밋 안 된 변경사항 있으면 경고
-3. "공유 모듈을 원격에서 가져오시겠습니까?" 확인
-4. 사용자 승인 후 진행
+1. `src/_shared/_version.json` 읽기
+2. 각 모듈별 원격 커밋 조회: `git ls-remote {원격URL} main`
+3. 버전 비교 테이블 표시:
 
-## Phase 2: Subtree Pull
+| 모듈 | 로컬 버전 | 원격 버전 | 상태 |
+|------|----------|----------|------|
+| ui-shell | (커밋 앞 7자리) | (커밋 앞 7자리) | ✅ 최신 / ⬇️ 업데이트 필요 |
+| components | ... | ... | ... |
+| core | ... | ... | ... |
+
+4. `localModified: true`인 모듈은 ⚠️ 로컬 수정됨 표시
+5. 업데이트 필요한 모듈이 없으면 "모든 모듈이 최신 상태입니다" 표시 후 종료
+
+## Phase 2: 사전 확인
+
+1. 커밋 안 된 변경사항 있으면 경고
+2. "공유 모듈을 원격에서 가져오시겠습니까?" 확인
+3. 사용자 승인 후 진행
+
+## Phase 3: Subtree Pull
 
 ```bash
 # 모듈별 원격 저장소
@@ -39,15 +53,21 @@ core:       https://github.com/testkim00/core-lib.git
 git subtree pull --prefix=src/_shared/{모듈} {원격URL} main --squash
 ```
 
-**all인 경우:**
+## Phase 4: 버전 파일 업데이트
+
+1. pull 완료 후 `src/_shared/_version.json` 업데이트:
+   - `lastSync`: 현재 시간 (ISO 8601 형식)
+   - 각 모듈의 `commit`: 새로운 원격 커밋 해시
+   - 각 모듈의 `localModified`: false
+
+2. 버전 파일 변경사항 커밋:
 ```bash
-git subtree pull --prefix=src/_shared/ui-shell https://github.com/testkim00/ui-shell.git main --squash
-git subtree pull --prefix=src/_shared/components https://github.com/testkim00/ui-components.git main --squash
-git subtree pull --prefix=src/_shared/core https://github.com/testkim00/core-lib.git main --squash
+git add src/_shared/_version.json
+git commit -m "chore: 공유 모듈 버전 정보 업데이트"
 ```
 
-## Phase 3: 결과 안내
+## Phase 5: 결과 안내
 
 - 동기화된 모듈 표시
 - 업데이트된 파일 목록
-- 변경된 파일 수
+- 새 버전 정보 표시
