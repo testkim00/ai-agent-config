@@ -59,10 +59,22 @@ relations:
     skills: []
     description: "Codex 자문 명령어"
 
-  # Project 관련 (프로젝트 생성만)
-  - commands: ["project/*"]
+  # Project 관련
+  - commands: ["project/new.md"]
     skills: []
     description: "프로젝트 생성"
+
+  - commands: ["project/define.md"]
+    skills: []
+    description: "프로젝트 등록/별칭 관리 (전역 레지스트리)"
+
+  - commands: ["project/structure.md"]
+    skills: ["project-structure"]
+    description: "프로젝트 구조 분석 및 AI용 명세 문서 생성"
+
+  - commands: ["project/memo.md"]
+    skills: []
+    description: "세션 작업 내용 도메인별 축약 저장 (인덱스 기반 중복 방지)"
 
   # 기타 독립 커맨드
   - commands: ["fix-encoding.md"]
@@ -97,6 +109,9 @@ skill_internals:
     - "SKILL.md"
 
   dooray:
+    - "skill.md"
+
+  project-structure:
     - "skill.md"
 
   sync-config:

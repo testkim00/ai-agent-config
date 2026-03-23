@@ -1,0 +1,36 @@
+# 프로젝트 레지스트리
+# /project:define 명령으로 관리
+# AI가 별칭으로 프로젝트를 식별할 때 참조
+
+projects:
+  - name: WooriErp
+    path: /Users/honeychaser/Projects/WooriErp/WooriErp
+    type: server
+    stack: ".NET 10"
+    aliases:
+      - "ERP서버"
+    description: "우리관리 ERP 서버 백엔드"
+
+  - name: WooriDataPlatform
+    path: /Users/honeychaser/Projects/WooriDataPlatform
+    type: server
+    stack: ".NET 10"
+    aliases:
+      - "데이터플랫폼"
+    description: "우리관리 데이터플랫폼 서비스"
+
+  - name: WooriErpClient
+    path: /Users/honeychaser/Projects/WooriErpClient/WooriErpClient
+    type: client
+    stack: "Vue3 + Quasar"
+    aliases:
+      - "ERP클라이언트"
+    description: "ERP클라이언트 vue 서비스"
+
+  - name: WooriApi
+    path: /Users/honeychaser/Projects/WooriApi/WooriApi
+    type: server
+    stack: ".NET 8"
+    aliases:
+      - "API서버"
+    description: "우리관리 SNC API서버 서비스"
