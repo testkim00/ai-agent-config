@@ -34,7 +34,13 @@
 │        ├ 3-1. 아키텍처 패턴 (레이어, 모듈, DI 등)                     │
 │        ├ 3-2. 코딩 컨벤션 (네이밍, 파일 구조)                         │
 │        ├ 3-3. 데이터 모델 요약 (DB 컨텍스트, 엔티티)                   │
-│        └ 3-4. API 엔드포인트 수집 (해당 시)                           │
+│        ├ 3-4. API 엔드포인트 수집 (해당 시)                           │
+│        ├ 3-5. 초기화/부트 체인 (부트 순서, 전역 등록 객체)            │
+│        ├ 3-6. HTTP 통신 패턴 (인터셉터, 캐싱, 타임아웃)              │
+│        ├ 3-7. 인증/권한 흐름 (토큰, 세션, 권한 체크)                  │
+│        ├ 3-8. 에러 처리 체계 (커스텀 에러, 전역 핸들러)               │
+│        ├ 3-9. 공통 컴포넌트 분류 (카테고리별 주요 컴포넌트)           │
+│        └ 3-10. 새 모듈 추가 레시피 도출 (기존 모듈 패턴 기반)         │
 ├─────────────────────────────────────────────────────────────────────┤
 │ 4단계: 문서 생성                                                      │
 │        ├ 4-1. 출력 템플릿에 맞춰 문서 작성                             │
@@ -104,12 +110,18 @@ node_modules, bin, obj, .git, dist, build, __pycache__,
 
 | 카테고리 | 대상 파일 |
 |---------|----------|
-| 엔트리포인트 | `Program.cs`, `main.ts`, `main.js`, `app.py`, `index.ts` |
+| 엔트리포인트 | `Program.cs`, `main.ts`, `main.js`, `app.py`, `index.ts`, `App.vue` |
 | 설정 | `appsettings*.json`, `vite.config.*`, `quasar.config.*`, `.env*` |
 | 라우팅 | `router/`, `Controllers/`, `routes/` |
 | 상태관리 | `stores/`, `store/` |
 | 데이터 | `Models/`, `Entities/`, `migrations/`, `DbContext` |
 | 미들웨어/확장 | `Extensions/`, `Middlewares/`, `plugins/` |
+| 부트/초기화 | `boot/`, `plugins/`, DI 등록 파일 |
+| HTTP 클라이언트 | `HttpService*`, `http/`, `api/client*`, `axios*` |
+| 인증 | `auth/`, `AuthService*`, `authStore*` |
+| 에러 처리 | `ErrorTypes*`, `Tripwire*`, `errorHandler*` |
+| 공통 컴포넌트 | `components/`, `_shared/`, `common/` |
+| 엔드포인트 정의 | `EndPoints*`, `endpoints*`, `api.ts` |
 | 테스트 | `tests/`, `__tests__/`, `*.Tests/` |
 
 **의존성 분석:**
@@ -138,6 +150,40 @@ node_modules, bin, obj, .git, dist, build, __pycache__,
 - 파일/폴더 네이밍 (PascalCase, camelCase, kebab-case)
 - 클래스/함수 네이밍 패턴
 - 들여쓰기 스타일 (`.editorconfig` 참조)
+
+**초기화/부트 체인 분석:**
+- 부트 파일 로드 순서 (quasar boot, next.config, main.ts 등)
+- `globalThis`/`window`에 등록되는 전역 객체 추적
+- 전역 유틸리티 함수 (notify, loader 등) 목록화
+
+**HTTP 통신 패턴 분석:**
+- HTTP 클라이언트 파일 위치 및 래퍼 구조
+- 요청 인터셉터 (인증 토큰 주입, 에러 변환)
+- 응답 캐싱 전략 (TTL, LRU 등)
+- 타임아웃 프로파일
+- 로그 자동 기록 여부 (POST/PATCH/DELETE 시)
+
+**인증/권한 흐름 분석:**
+- 인증 방식 (SSO, JWT, Cookie, OAuth 등)
+- 토큰 저장/갱신 위치 (Cookie, localStorage, SessionStorage)
+- 권한 체크 API (can(), hasRole() 등)
+- 세션 관리 방식
+
+**에러 처리 체계 분석:**
+- 커스텀 에러 클래스 (ErrorTypes 등)
+- 전역 에러 핸들러 (Vue errorHandler, window.onerror 등)
+- 에러 콜백 패턴 (Tripwire 등)
+- 재시도 가능 에러 구분
+
+**공통 컴포넌트 분류:**
+- 카테고리별 주요 컴포넌트 역할 (grids, controls, dialog, buttons 등)
+- Base 컴포넌트 패턴 (상속/합성 구조)
+
+**새 모듈 추가 레시피 도출:**
+- 기존 모듈 1~2개를 대표로 분석
+- 생성해야 할 파일 목록과 순서 (의존성 순)
+- 각 파일의 네이밍 패턴
+- 코드 수정 없이 필요한 설정 (메뉴 등록, 라우트 자동 등록 등)
 
 ---
 

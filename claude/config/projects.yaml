@@ -9,7 +9,9 @@ projects:
     stack: ".NET 10"
     aliases:
       - "ERP서버"
-    description: "우리관리 ERP 서버 백엔드"
+      - "ERP"
+      - "WAS서버"
+    description: "ERP WAS API 서버"
 
   - name: WooriDataPlatform
     path: /Users/honeychaser/Projects/WooriDataPlatform
