@@ -93,6 +93,81 @@ Codex는 플러그인 마켓플레이스가 없습니다:
 - Codex는 `commands` 폴더를 지원하지 않음
 - 공식 스킬도 직접 `skills/` 폴더에 넣어야 함
 
+### Codex Command Mapping
+
+Claude의 `/group:name` 커맨드는 Codex에서 직접 지원되지 않으므로, 이 저장소에서는 `group-name` 형식의 skill로 대응합니다.
+
+매핑/동기화 기준 스킬:
+
+- `skill-sync`
+  - 경로: `codex/skills/skill-sync/SKILL.md`
+  - 역할: `claude/commands/**/*.md`를 읽고 Codex skill 구조로 대응 매핑
+
+Codex에서 이 매핑 작업 자체를 실행할 때는 `$skill-sync`를 사용합니다.
+
+주의:
+
+- `skill-sync`는 "Claude commands -> Codex skills 매핑" 전용 스킬입니다.
+- `config-sync`는 Claude의 원래 `/config:sync` 의미를 그대로 가져온 Codex skill입니다.
+- `tidy/_common.md`는 공용 헬퍼이므로 Codex leaf skill 매핑 대상에서 제외합니다.
+
+현재 매핑된 command/skill:
+
+#### Core
+
+| Claude command | Codex skill | 경로 |
+|----------------|-------------|------|
+| `/analyze:orchestration` | `analyze-orchestration` | `codex/skills/analyze-orchestration/SKILL.md` |
+| `/az:swa` | `az-swa` | `codex/skills/az-swa/SKILL.md` |
+| `/codex` | `codex` | `codex/skills/codex/SKILL.md` |
+| `/consult` | `consult` | `codex/skills/consult/SKILL.md` |
+| `/dooray:messenger` | `dooray-messenger` | `codex/skills/dooray-messenger/SKILL.md` |
+| `/fix-encoding` | `fix-encoding` | `codex/skills/fix-encoding/SKILL.md` |
+| `/orchestration` | `orchestration` | `codex/skills/orchestration/SKILL.md` |
+
+#### Git
+
+| Claude command | Codex skill | 경로 |
+|----------------|-------------|------|
+| `/git:pr` | `git-pr` | `codex/skills/git-pr/SKILL.md` |
+| `/git:save` | `git-save` | `codex/skills/git-save/SKILL.md` |
+| `/git:push` | `git-push` | `codex/skills/git-push/SKILL.md` |
+| `/git:switch` | `git-switch` | `codex/skills/git-switch/SKILL.md` |
+| `/git:sync` | `git-sync` | `codex/skills/git-sync/SKILL.md` |
+| `/git:cleanup` | `git-cleanup` | `codex/skills/git-cleanup/SKILL.md` |
+
+#### Config / DB / Env
+
+| Claude command | Codex skill | 경로 |
+|----------------|-------------|------|
+| `/config:push` | `config-push` | `codex/skills/config-push/SKILL.md` |
+| `/config:sync` | `config-sync` | `codex/skills/config-sync/SKILL.md` |
+| `/db:convert` | `db-convert` | `codex/skills/db-convert/SKILL.md` |
+| `/db:query` | `db-query` | `codex/skills/db-query/SKILL.md` |
+| `/env:add` | `env-add` | `codex/skills/env-add/SKILL.md` |
+| `/env:list` | `env-list` | `codex/skills/env-list/SKILL.md` |
+| `/env:remove` | `env-remove` | `codex/skills/env-remove/SKILL.md` |
+| `/env:sync` | `env-sync` | `codex/skills/env-sync/SKILL.md` |
+
+#### Project / Shared / Tidy
+
+| Claude command | Codex skill | 경로 |
+|----------------|-------------|------|
+| `/project:define` | `project-define` | `codex/skills/project-define/SKILL.md` |
+| `/project:memo` | `project-memo` | `codex/skills/project-memo/SKILL.md` |
+| `/project:new` | `project-new` | `codex/skills/project-new/SKILL.md` |
+| `/project:structure` | `project-structure` | `codex/skills/project-structure/SKILL.md` |
+| `/shared:init` | `shared-init` | `codex/skills/shared-init/SKILL.md` |
+| `/shared:pull` | `shared-pull` | `codex/skills/shared-pull/SKILL.md` |
+| `/shared:push` | `shared-push` | `codex/skills/shared-push/SKILL.md` |
+| `/tidy:md` | `tidy-md` | `codex/skills/tidy-md/SKILL.md` |
+| `/tidy:meta` | `tidy-meta` | `codex/skills/tidy-meta/SKILL.md` |
+
+보조 git 스킬:
+
+- `git-convention`: 커밋 메시지/브랜치 규칙
+- `git-workflow`: 범용 Git 안전 규칙과 작업 절차
+
 ### 스킬 공유 구조
 
 ```

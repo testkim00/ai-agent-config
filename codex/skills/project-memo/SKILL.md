@@ -1,3 +1,28 @@
+---
+name: project-memo
+description: Claude command `/project:memo` 대응 스킬. Claude의 `/project:memo` 명령을 Codex에서 skill로 사용할 때 대응 매핑으로 사용한다.
+---
+
+# Project Memo
+
+## 언제 사용하나
+
+- Claude command `/project:memo` 대응 스킬.
+- Claude의 `/project:memo`를 Codex에서 같은 의도로 수행해야 할 때
+
+## source mapping
+
+- Claude command: `/project:memo`
+- Source file: `claude/commands/project/memo.md`
+
+## 기본 규칙
+
+- source command의 의도를 유지한다.
+- Claude 전용 구문인 `allowed-tools`, `Task`, `AskUserQuestion`은 Codex 실행 환경에 맞게 해석한다.
+- 사용자가 같은 동작을 요청하면 아래 source workflow를 기준으로 수행한다.
+
+## source workflow
+
 # Project Memo
 
 세션 작업 내용을 도메인 단위로 축약 저장. 코드의 주석 역할.

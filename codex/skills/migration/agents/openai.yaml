@@ -1,0 +1,4 @@
+interface:
+  display_name: "Migration"
+  short_description: "Analyze a WERPBiz legacy module for Vue/.NET migration"
+  default_prompt: "Analyze the current folder, or a user-specified legacy module folder, end-to-end for migration into WooriErpClient and WooriErp, including screen flow, procedures, tables, and implementation-ready docs."
