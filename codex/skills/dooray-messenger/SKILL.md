@@ -1,215 +1,72 @@
 ---
 name: dooray-messenger
-description: Claude command `/dooray:messenger` 대응 스킬. Claude의 `/dooray:messenger` 명령을 Codex에서 skill로 사용할 때 대응 매핑으로 사용한다.
+description: Dooray 메신저로 텍스트나 파일 링크를 전송할 때 사용하는 스킬. Claude의 `/dooray:messenger` 의도는 유지하되, Codex에서는 직접 실행과 최소 질문 원칙으로 처리한다.
 ---
 
 # Dooray Messenger
 
 ## 언제 사용하나
 
-- Claude command `/dooray:messenger` 대응 스킬.
-- Claude의 `/dooray:messenger`를 Codex에서 같은 의도로 수행해야 할 때
+- 사용자가 Dooray 메신저로 메시지 전송을 명시적으로 요청할 때
+- 이전 작업 결과, 파일, 짧은 안내 문구를 특정 사용자에게 보내야 할 때
+- 이름, user_id, 이메일로 수신자를 찾고 직접 메시지를 보내야 할 때
 
 ## source mapping
 
 - Claude command: `/dooray:messenger`
 - Source file: `claude/commands/dooray/messenger.md`
 
-## 기본 규칙
+## Codex 기준 핵심 해석
 
-- source command의 의도를 유지한다.
-- Claude 전용 구문인 `allowed-tools`, `Task`, `AskUserQuestion`은 Codex 실행 환경에 맞게 해석한다.
-- 사용자가 같은 동작을 요청하면 아래 source workflow를 기준으로 수행한다.
+- 이 스킬은 기본적으로 메인 에이전트가 직접 처리한다.
+- 외부 API를 실제로 호출하는 작업이므로, `정말 전송하라`는 사용자 의도가 분명할 때만 실행한다.
+- 이름이 중복되거나 전송 내용이 애매하면 한 번만 짧게 확인한다.
+- 하위 에이전트는 기본 전략이 아니다.
 
-## source workflow
+## 입력 해석
 
-# Dooray Messenger 커맨드
+전송 내용 우선순위:
 
-세션의 마지막 출력 결과를 두레이 메신저로 전송합니다.
+1. 사용자가 이번 턴에 준 명시적 텍스트
+2. 사용자가 지정한 파일 경로 또는 방금 만든 파일
+3. 현재 스레드의 가장 최근 결과 요약
 
-## 사용법
+수신자 해석:
 
-```
-/dooray:messenger {사용자}
-/dooray:messenger {사용자} {부서}
-```
+- 이름
+- user_id
+- 이메일
+- 이름이 중복되면 부서명으로 좁힌다
 
-## 입력 결정
+## 필요한 데이터
 
-| 우선순위 | 조건 | 전송 내용 |
-|---------|------|----------|
-| 1 | 파이프라인 + 파일 (`$PIPE_INPUT`) | 파일을 드라이브에 업로드 후 링크 전송 |
-| 2 | 파이프라인 + 텍스트 | 텍스트 메시지 전송 |
-| 3 | 단독 실행 | 세션의 마지막 출력 내용 전송 |
+- 토큰: `~/.codex/.env` 의 `DOORAY_API_TOKEN`
+- 직원 매핑: `~/Projects/company-data/본사직원.json`
 
-## 파이프라인 예시
+## 실행 절차
 
-```bash
-# 쿼리 결과 파일을 업로드 후 링크 전송
-/db:query 입사자 현황 > 직원목록.xlsx | /dooray:messenger kbs
+1. 수신자와 전송 내용을 확정한다.
+2. 직원 데이터에서 이름, user_id, 이메일로 수신자를 찾는다.
+3. 동명이인이면 부서로 좁히거나 사용자에게 짧게 확인한다.
+4. 텍스트면 직접 메시지를 보낸다.
+5. 파일이면 업로드 가능한 경로와 방식이 있는지 먼저 확인하고, 가능하면 링크와 함께 전송한다.
+6. API 응답을 확인하고 결과를 사용자에게 보고한다.
 
-# PDF 변환 후 전송
-/db:query 월간보고 > 보고서.xlsx | /db:convert pdf | /dooray:messenger 김범수 정보화추진팀
-```
+## 기본 검증
 
-- `{사용자}`: 이름(김범수), user_id(kbs), 또는 이메일(kbs@woorihom.co.kr)
-- `{부서}`: 동명이인 구분용 (선택사항)
+- 수신자가 정확히 1명으로 해석됐는지 확인
+- 전송 텍스트 또는 파일 경로가 비어 있지 않은지 확인
+- API 응답의 성공/실패 여부 확인
 
-## 예시
+## 사용자에게 물어봐야 하는 경우
 
-```bash
-# user_id로 전송
-/dooray:messenger kbs
+- 이름이 여러 명으로 매칭될 때
+- 어떤 내용을 보낼지 애매할 때
+- 파일 전송을 원하지만 업로드 가능한 경로나 방식이 불명확할 때
 
-# 이름으로 전송
-/dooray:messenger 김범수
+## 하지 말아야 할 것
 
-# 이메일로 전송
-/dooray:messenger kbs@woorihom.co.kr
-
-# 동명이인 구분 (부서 지정)
-/dooray:messenger 김범수 정보화추진팀
-```
-
----
-
-# 처리 흐름 (Subagent 활용)
-
-> 모델 설정: `~/.claude/skills/subagent-convention/config.md` 참조
-
-## 역할 분담
-
-| 역할 | 담당 | 작업 |
-|------|------|------|
-| **판단** | Opus (메인) | 전송 내용 결정, 동명이인 처리 |
-| **실행** | Sonnet subagent | 사용자 조회, API 호출, 메시지 전송 |
-
-## Phase 1: 판단 (Opus)
-
-- 전송할 내용 결정 (파일/텍스트)
-- 동명이인 있으면 사용자에게 선택 요청
-
-## Phase 2: 메시지 전송 (Sonnet Subagent)
-
-```
-Task(
-    subagent_type="sonnet",
-    model="sonnet",
-    prompt="""
-    두레이 메시지 전송 작업:
-
-    수신자: {사용자명 또는 ID}
-    부서: {부서명 또는 없음}
-    전송 내용: {메시지 또는 파일 경로}
-    전송 타입: {text/file}
-
-    1. 사용자 조회
-       - ~/Projects/company-data/본사직원.json 읽기
-       - 이름/user_id/이메일로 검색
-       - dooray_member_id 확인
-
-    2. 메시지 전송 (Python urllib 사용)
-       - API: POST https://api.dooray.com/messenger/v1/channels/direct-send
-       - 헤더: Authorization: dooray-api {토큰}
-       - 토큰: ~/.claude/.env의 DOORAY_API_TOKEN
-
-    3. 파일인 경우
-       - 드라이브 업로드 먼저
-       - 링크 포함하여 전송
-
-    4. 결과 반환
-       - 전송 성공/실패
-       - 수신자 정보
-    """
-)
-```
-
-## Phase 3: 결과 확인 (Opus)
-
-- 전송 결과 확인
-- 사용자에게 응답
-
-## Python 구현
-
-```python
-import urllib.request
-import json
-import os
-
-def load_env(path='~/.claude/.env'):
-    env = {}
-    with open(os.path.expanduser(path)) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith('#') and '=' in line:
-                key, value = line.split('=', 1)
-                env[key.strip()] = value.strip()
-    return env
-
-def find_employee(name_or_id_or_email, dept=None):
-    """본사직원.json에서 직원 찾기 (이름, user_id, 이메일 지원)"""
-    with open(os.path.expanduser('~/Projects/company-data/본사직원.json'), 'r', encoding='utf-8') as f:
-        data = json.load(f)
-
-    # 이메일인 경우 user_id 추출
-    search_key = name_or_id_or_email
-    if '@' in name_or_id_or_email:
-        search_key = name_or_id_or_email.split('@')[0]
-
-    matches = []
-    for emp in data['employees']:
-        if emp['name'] == search_key or emp.get('user_id') == search_key:
-            matches.append(emp)
-
-    if not matches:
-        return None, "직원을 찾을 수 없습니다"
-
-    if len(matches) == 1:
-        return matches[0], None
-
-    # 동명이인 처리
-    if dept:
-        for m in matches:
-            if m['dept'] == dept:
-                return m, None
-        return None, f"해당 부서({dept})에 직원이 없습니다"
-
-    return matches, "동명이인"
-
-def send_message(member_id, text):
-    """두레이 메시지 전송"""
-    env = load_env()
-    token = env.get('DOORAY_API_TOKEN')
-
-    url = "https://api.dooray.com/messenger/v1/channels/direct-send"
-    data = {
-        "text": text,
-        "organizationMemberId": member_id
-    }
-
-    req = urllib.request.Request(url, method='POST')
-    req.add_header("Authorization", f"dooray-api {token}")
-    req.add_header("Content-Type", "application/json")
-    req.data = json.dumps(data).encode('utf-8')
-
-    with urllib.request.urlopen(req) as response:
-        return json.loads(response.read().decode('utf-8'))
-```
-
-## 환경변수
-
-```bash
-# ~/.claude/.env
-DOORAY_API_TOKEN=xxx:xxx
-```
-
-## 데이터 파일
-
-| 파일 | 설명 |
-|------|------|
-| `~/Projects/company-data/본사직원.json` | 본사 직원 목록 (dooray_member_id 포함) |
-| `~/Projects/company-data/dooray_members.json` | 두레이 멤버 ID 매핑 |
-
-## 참고
-
-- [두레이 API 문서](https://helpdesk.dooray.com/share/pages/9wWo-xwiR66BO5LGshgVTg/2937064454837487755)
+- 사용자가 명시적으로 보내라고 하지 않았는데 실제 전송하지 말 것
+- 동명이인인데 임의로 한 명을 골라 보내지 말 것
+- 토큰이나 내부 식별자를 사용자 응답에 그대로 노출하지 말 것
+- 파일 업로드 경로가 불명확한데 있는 것처럼 가정하지 말 것

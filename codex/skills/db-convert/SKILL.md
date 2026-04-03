@@ -1,196 +1,102 @@
 ---
 name: db-convert
-description: Claude command `/db:convert` 대응 스킬. Claude의 `/db:convert` 명령을 Codex에서 skill로 사용할 때 대응 매핑으로 사용한다.
+description: `db-query` 결과 파일이나 사용자가 지정한 파일을 csv, xlsx, pdf 같은 형식으로 바꿀 때 사용하는 변환 스킬. Claude의 `/db:convert` 의도는 유지하되 Codex에서는 로컬 파일 변환 작업으로 해석한다.
 ---
 
 # Db Convert
 
 ## 언제 사용하나
 
-- Claude command `/db:convert` 대응 스킬.
-- Claude의 `/db:convert`를 Codex에서 같은 의도로 수행해야 할 때
+- `db-query` 결과 파일을 다른 형식으로 바꿔야 할 때
+- xlsx를 csv나 pdf로, csv를 xlsx로 바꿔야 할 때
+- 사용자가 특정 출력 파일명을 지정해 산출물을 정리하고 싶을 때
 
 ## source mapping
 
 - Claude command: `/db:convert`
 - Source file: `claude/commands/db/convert.md`
 
-## 기본 규칙
+## 이 스킬이 하는 일
 
-- source command의 의도를 유지한다.
-- Claude 전용 구문인 `allowed-tools`, `Task`, `AskUserQuestion`은 Codex 실행 환경에 맞게 해석한다.
-- 사용자가 같은 동작을 요청하면 아래 source workflow를 기준으로 수행한다.
+이 스킬은 `DB에 다시 질의하는 스킬`이 아니라, 이미 만들어진 결과 파일을 다른 형식으로 바꾸는 `파일 변환 스킬`이다.
 
-## source workflow
+대표 예:
 
-# DB Convert 커맨드
+- `db-query`가 만든 `.xlsx`를 `.pdf`로 변환
+- `.xlsx`를 `.csv`로 변환
+- `.csv`를 `.xlsx`로 변환
 
-파일을 다른 형식으로 변환합니다.
+## Codex 기준 핵심 해석
 
-## 사용법
+- 기본은 메인 에이전트가 로컬에서 직접 변환한다.
+- 파이프라인 개념은 `직전 산출물` 또는 `사용자가 명시한 입력 파일`로 해석한다.
+- 입력 파일이 없으면 먼저 파일을 특정해야 한다.
+- 변환 성공 판단은 `실제 출력 파일 생성`과 `기본 무결성 확인`까지 포함한다.
 
-```
-/db:convert {형식}
-/db:convert {형식} {출력파일명}
-```
+## 입력 파일 우선순위
 
-## 입력 파일 결정
+1. 사용자가 명시한 입력 파일
+2. 현재 턴에서 방금 만든 결과 파일
+3. 최근 `db-query` 산출물
 
-| 우선순위 | 조건 | 입력 파일 |
-|---------|------|----------|
-| 1 | 파이프라인 (`\|`) 으로 연결됨 | `$PIPE_INPUT` (이전 커맨드 출력) |
-| 2 | 단독 실행 | 마지막 `/db:query` 출력 파일 |
+입력 파일을 결정할 수 없으면:
+
+- 먼저 파일 경로를 물어보거나
+- `db-query`를 먼저 실행하라고 안내한다
 
 ## 지원 형식
 
-| 형식 | 설명 |
-|------|------|
-| `pdf` | PDF 문서로 변환 |
-| `csv` | CSV 파일로 변환 |
-| `xlsx` | 엑셀 파일로 변환 |
+기본 지원:
 
-## 파일명 규칙
+- `xlsx -> pdf`
+- `xlsx -> csv`
+- `csv -> xlsx`
 
-| 명령 | 출력 파일명 |
-|------|------------|
-| `/db:convert pdf` | 마지막 파일명 기반 자동 생성 |
-| `/db:convert pdf report.pdf` | 지정한 파일명 사용 |
+환경에 따라 가능한 추가 변환:
 
-## 예시
+- `csv -> pdf`
+- `docx -> pdf`
 
-```
-/db:convert pdf                    # → 도급직원입사자_20260117.pdf (자동)
-/db:convert pdf 월간보고서.pdf      # → 월간보고서_20260117.pdf (지정)
-/db:convert csv                    # → 도급직원입사자_20260117.csv (자동)
-/db:convert csv 직원목록.csv        # → 직원목록_20260117.csv (지정)
-```
+단, PDF 계열은 보통 LibreOffice 같은 외부 도구 설치 여부에 따라 달라진다.
 
----
+## 실행 절차
 
-## 처리 흐름 (Subagent 활용)
-
-> 모델 설정: `~/.claude/skills/subagent-convention/config.md` 참조
-
-### 역할 분담
-
-| 역할 | 담당 | 작업 |
-|------|------|------|
-| **판단** | Opus (메인) | 입력 파일 결정, 변환 형식 확인 |
-| **실행** | Sonnet subagent | 실제 파일 변환 작업 |
-
-### Phase 1: 판단 (Opus)
-
-1. 마지막 출력 파일 확인
-2. 변환 형식 결정
-3. 출력 경로 결정
-
-마지막 출력 파일이 없으면:
-> "변환할 파일이 없습니다. 먼저 `/db:query`를 실행해주세요."
-
-### Phase 2: 변환 실행 (Sonnet Subagent)
-
-**파일 변환 작업을 sonnet subagent에게 위임:**
-
-```
-Task(
-    subagent_type="sonnet",
-    model="sonnet",
-    prompt="""
-    파일 변환 작업:
-
-    입력 파일: {입력 파일 경로}
-    출력 형식: {형식}
-    출력 경로: {출력 파일 경로}
-
-    변환 방법:
-    - xlsx → pdf: LibreOffice 사용
-      soffice --headless --convert-to pdf --outdir {출력폴더} {입력파일}
-    - xlsx → csv: pandas 사용
-      df = pd.read_excel(입력); df.to_csv(출력, encoding='utf-8-sig')
-    - csv → xlsx: pandas 사용
-      df = pd.read_csv(입력); df.to_excel(출력, index=False)
-
-    결과:
-    - 변환 성공 시 출력 파일 경로 반환
-    - 실패 시 에러 메시지 반환
-    """
-)
-```
-
-### Phase 3: 결과 확인 (Opus)
-
-- 변환 결과 확인
-- 사용자에게 결과 알림
-
----
-
-## 형식별 변환 코드 (Sonnet 참고용)
-
-### xlsx → pdf
-```python
-import subprocess
-import os
-
-input_file = "{입력파일}"
-output_dir = os.path.dirname("{출력파일}")
-
-subprocess.run([
-    'soffice', '--headless', '--convert-to', 'pdf',
-    '--outdir', output_dir,
-    input_file
-])
-```
-
-### xlsx → csv
-```python
-import pandas as pd
-
-df = pd.read_excel("{입력파일}")
-df.to_csv("{출력파일}", index=False, encoding='utf-8-sig')
-```
-
-### csv → xlsx
-```python
-import pandas as pd
-
-df = pd.read_csv("{입력파일}")
-df.to_excel("{출력파일}", index=False)
-```
-
----
+1. 입력 파일과 목표 형식을 확정한다.
+2. 출력 파일명을 결정한다.
+3. 필요한 도구가 있는지 확인한다.
+   - `pandas`
+   - `soffice` 또는 LibreOffice
+4. 변환을 실행한다.
+5. 출력 파일 존재 여부와 기본 무결성을 확인한다.
+6. 결과 파일 경로를 사용자에게 알려준다.
 
 ## 출력 경로
 
 - 기본: `~/Projects/db-outputs/{원본파일명}.{새형식}`
-- 파일명 지정 시: `~/Projects/db-outputs/{지정파일명}.{형식}`
+- 사용자가 파일명을 지정하면 그 이름을 우선한다
 
-## 변환 매트릭스
+## 기본 검증
 
-| 원본 | → pdf | → csv | → xlsx |
-|------|-------|-------|--------|
-| .xlsx | ✅ | ✅ | - |
-| .csv | ✅ | - | ✅ |
-| .docx | ✅ | ❌ | ❌ |
+- 출력 파일이 실제로 생성됐는지 확인
+- 파일 크기가 0이 아닌지 확인
+- 확장자가 요청 형식과 맞는지 확인
+- csv/xlsx면 간단히 열어볼 수 있는지 확인
 
 ## 주의사항
 
-- CSV 변환 시 서식 정보는 손실됩니다
-- 한글 인코딩은 `utf-8-sig` 사용 (엑셀 호환)
+- CSV 변환 시 서식 정보는 유지되지 않는다
+- 한글 CSV는 가능하면 `utf-8-sig`를 사용한다
+- PDF 변환 품질은 입력 파일 서식과 LibreOffice 환경에 영향을 받는다
 
-## PDF 변환 요구사항
+## 사용자에게 물어봐야 하는 경우
 
-PDF 변환에는 LibreOffice가 필요합니다.
+- 입력 파일을 특정할 수 없을 때
+- 출력 파일명을 명확히 정해야 할 때
+- 필요한 변환 도구가 설치되어 있지 않을 때
 
-**설치 방법 (macOS):**
-```bash
-brew install --cask libreoffice
-```
+## 하지 말아야 할 것
 
-**설치 후 경로 확인:**
-```bash
-/Applications/LibreOffice.app/Contents/MacOS/soffice --version
-```
-
-**미설치 시 대안:**
-- CSV로 변환 후 다른 도구로 PDF 생성
-- 엑셀에서 직접 PDF 내보내기
+- 입력 파일이 없는데 추측으로 변환하지 말 것
+- 변환이 실패했는데 성공한 것처럼 보고하지 말 것
+- CSV 변환 후 서식이 보존된다고 암묵적으로 약속하지 말 것
+- PDF 변환 도구가 없는데 가능한 것처럼 가정하지 말 것

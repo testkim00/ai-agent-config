@@ -1,234 +1,68 @@
 ---
 name: az-swa
-description: "Manage Azure Static Web Apps: inventory, deployment, custom domains, SSL, RBAC. Use WHEN deploying to SWA, WHEN checking SWA status, WHEN managing SWA domains/SSL, WHEN granting SWA permissions, WHEN syncing SWA inventory. NOT for App Service (use /az:web-app), NOT for APIM (use /az:apim)." Claude의 `/az:swa` 명령을 Codex에서 skill로 사용할 때 대응 매핑으로 사용한다.
+description: Azure Static Web Apps 리소스 조회, 배포, 커스텀 도메인/SSL, RBAC 작업을 수행할 때 사용한다. Claude의 `/az:swa` 명령을 Codex에서 같은 의도로 수행해야 할 때 사용한다.
 ---
 
-# Az Swa
+# Azure SWA
 
 ## 언제 사용하나
 
-- "Manage Azure Static Web Apps: inventory, deployment, custom domains, SSL, RBAC. Use WHEN deploying to SWA, WHEN checking SWA status, WHEN managing SWA domains/SSL, WHEN granting SWA permissions, WHEN syncing SWA inventory. NOT for App Service (use /az:web-app), NOT for APIM (use /az:apim)."
-- Claude의 `/az:swa`를 Codex에서 같은 의도로 수행해야 할 때
+- Azure Static Web Apps 인벤토리, 상태, 환경 정보를 조회하거나 동기화할 때
+- SWA CLI로 Static Web Apps에 배포할 때
+- 커스텀 도메인, SSL 상태, RBAC 권한을 점검하거나 변경할 때
+- App Service나 APIM이 아니라 Static Web Apps 자체를 다뤄야 할 때
 
 ## source mapping
 
 - Claude command: `/az:swa`
 - Source file: `claude/commands/az/swa.md`
 
+## 프로젝트 매핑
+
+- 현재 작업 디렉터리명이 `WooriErpClient`면 SWA 리소스는 `swa-werp-client`, 토큰 키는 `SWA_WERP_CLIENT_API_TOKEN`으로 본다.
+- 현재 작업 디렉터리명이 `WooriDataPlatformClient`면 SWA 리소스는 `swa-dataplatform-client`, 토큰 키는 `SWA_DATAPLATFORM_CLIENT_API_TOKEN`으로 본다.
+- `az-swa deploy`처럼 대상 앱을 생략한 요청은 현재 작업 디렉터리명을 기준으로 위 매핑을 먼저 적용한다.
+- 현재 프로젝트가 매핑표에 없으면 임의 추정하지 말고 대상 SWA 이름 또는 토큰 키를 짧게 확인한다.
+
 ## 기본 규칙
 
-- source command의 의도를 유지한다.
-- Claude 전용 구문인 `allowed-tools`, `Task`, `AskUserQuestion`은 Codex 실행 환경에 맞게 해석한다.
-- 사용자가 같은 동작을 요청하면 아래 source workflow를 기준으로 수행한다.
+- Azure Static Web Apps 작업은 `az staticwebapp`와 `swa` CLI를 구분해서 사용한다.
+- 배포는 `swa deploy`를 사용하고, 운영 반영이 목적이면 항상 `--env production`을 명시한다.
+- 배포 요청에서는 현재 프로젝트에 매핑된 `.env` 토큰 키를 먼저 찾고, 토큰이 있으면 `--deployment-token`을 우선 사용한다.
+- `swa login` 또는 `swa deploy`가 프로젝트 `.env`를 덮어쓸 수 있으므로, 추적 파일이면 작업 후 원복 여부를 확인한다.
+- `staticwebapp.config.json`은 앱 루트 기준으로 자동 포함된다고 가정하고, GitHub Actions 예외만 따로 판단한다.
+- RBAC 범위는 `Microsoft.Web/staticSites` 기준으로 잡고, App Service 범위와 혼동하지 않는다.
 
-## source workflow
+## 실행 절차
 
+1. 사용자의 요청을 `inventory`, `deploy`, `domain`, `rbac` 중 하나로 분류한다.
+2. 인벤토리가 필요하면 캐시 파일과 마지막 동기화 시점을 먼저 확인한다.
+3. 캐시가 오래됐거나 사용자가 동기화를 명시하면 `az staticwebapp list`와 `az staticwebapp hostname list`로 최신 정보를 갱신한다.
+4. 배포 요청이면 현재 작업 디렉터리명으로 프로젝트 매핑을 확인하고, 대응되는 SWA 리소스명과 `.env` 토큰 키를 먼저 결정한다.
+5. 프로젝트 루트의 `swa-cli.config.json`이 있으면 config 이름과 `appName`, `resourceGroup`, `outputLocation`을 읽고, 없으면 출력 디렉터리만 별도로 판단한다.
+6. config가 여러 개면 대상 config를 짧게 확인한 뒤, `build`, `build:pwa`, `skip` 중 빌드 방식을 정해서 배포한다.
+7. 매핑된 `.env` 토큰 키에서 deployment token을 읽을 수 있으면 `swa deploy --config-name <name> --deployment-token "$TOKEN" --env production` 형식을 우선 사용한다.
+8. `swa-cli.config.json`이 없으면 `swa deploy <output-dir> --deployment-token "$TOKEN" --env production` 형식으로 배포한다.
+9. 토큰 키가 없거나 현재 프로젝트가 매핑표에 없을 때만 대상 SWA 이름 또는 사용할 토큰 키를 짧게 확인한다.
+10. 배포 뒤에는 기본 호스트에 `curl -sI`로 응답 상태를 확인하고, `.env`가 오염됐으면 원복한다.
+11. 도메인 작업이면 먼저 `az staticwebapp hostname list`로 현재 상태를 보고, 신규 등록 전에는 `dig +short <hostname> CNAME`으로 DNS를 검증한다.
+12. SSL 상태 점검은 hostname 상태 조회 또는 `curl -v https://<hostname>` 결과로 확인한다.
+13. RBAC 작업이면 SWA scope를 구성하고, 필요 시 사용자 principal ID를 조회한 뒤 role assignment를 생성하거나 조회한다.
 
-# Manage Azure SWA
+## 사용자에게 물어봐야 하는 경우
 
-SWA lifecycle management: inventory cache, deployment (SWA CLI), custom domains, SSL, RBAC.
+- 현재 프로젝트 디렉터리명이 매핑표에 없어서 SWA 리소스나 토큰 키를 자동 결정할 수 없을 때
+- 매핑된 토큰 키가 `.env`에 없을 때
+- `swa-cli.config.json`에 config가 둘 이상이라 자동 선택이 애매할 때
+- `build`, `build:pwa`, `skip` 중 어떤 배포 흐름을 써야 하는지 불분명할 때
+- 사용자가 운영 또는 production 배포를 명시했고, 즉시 반영 여부를 재확인해야 할 때
+- 대상 SWA 이름, 구독, 리소스 그룹, 도메인이 불명확할 때
 
-## INTENT_ROUTER
+## 하지 말아야 할 것
 
-| Intent | Keywords | Workflow |
-|--------|----------|----------|
-| INVENTORY | list, show, sync, env, status | WORKFLOW_INVENTORY |
-| DEPLOY | deploy, push, upload | WORKFLOW_DEPLOY |
-| DOMAIN | domain, ssl, hostname, certificate | WORKFLOW_DOMAIN |
-| RBAC | permission, role, access, grant | WORKFLOW_RBAC |
-
----
-
-## INVENTORY
-
-Cached SWA resource map: [references/swa-inventory.json](references/swa-inventory.json)
-
-### Structure
-
-```json
-{
-  "last_synced": "ISO timestamp",
-  "resource_groups": {
-    "<rg-name>": {
-      "<swa-name>": {
-        "sku": "Free|Standard",
-        "defaultHostname": "*.azurestaticapps.net",
-        "customDomains": [],
-        "project": "local path (from github-env.json local_mapping)",
-        "repo": "GitHub repo name",
-        "buildOutput": "dist/spa or dist/pwa",
-        "purpose": "production|testbed"
-      }
-    }
-  }
-}
-```
-
-### WORKFLOW_INVENTORY
-
-```
-1. Read references/swa-inventory.json (cached)
-
-2. IF sync requested OR cache older than 7 days:
-   az staticwebapp list --query "[].{name:name, rg:resourceGroup, sku:sku.name, host:defaultHostname}" -o json
-   FOR each SWA:
-     az staticwebapp hostname list --name <name> --query "[].domainName" -o tsv
-   Cross-reference with github-env.json local_mapping
-   Update references/swa-inventory.json
-
-3. Display inventory table:
-   | SWA Resource | SKU | Project | Custom Domain | Purpose |
-```
-
----
-
-## WORKFLOW_DEPLOY
-
-### Pre-flight
-
-```
-1. Check SWA CLI: swa --version
-2. Read swa-cli.config.json in project root
-   - configurations 객체에서 첫 번째 (또는 유일한) config name 자동 감지
-   - config name이 1개면 그대로 사용, 2개 이상이면 사용자에게 선택 요청
-3. Resolve: appName, resourceGroup, outputLocation from detected config
-```
-
-### Deploy (default)
-
-```
-1. Confirm target: "Deploying to {appName} ({resourceGroup})"
-2. Build (user choice):
-   - AskUserQuestion: "빌드 방식을 선택하세요"
-     (1) build (SPA)  (2) build:pwa (PWA)  (3) 이미 빌드됨 (skip)
-   - Execute chosen build command
-3. Deploy:
-   swa deploy --config-name <auto-detected-config-name> --env production
-   ⚠️ --env production REQUIRED! Default is preview environment (custom domains not applied)
-4. Post-deploy: git checkout .env (SWA CLI writes Azure credentials to .env; restore after deploy)
-5. Verify:
-   curl -sI https://<default-hostname>
-   Check HTTP/2 200, Cache-Control headers
-```
-
-### Production 명시 배포 (사용자가 "운영" 또는 "production" 명시 시)
-
-```
-1. ⚠️ WARNING block:
-   "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    ⚠️  PRODUCTION DEPLOY WARNING
-    Target: {appName} ({resourceGroup})
-    This action takes effect on live service immediately.
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-2. AskUserQuestion: "운영 배포를 진행할까요? (yes 입력)"
-   IF answer != "yes": abort
-
-3. Build + Deploy: same as default flow
-```
-
-### swa-cli.config.json 없는 경우 (fallback)
-
-```
-TOKEN=$(az staticwebapp secrets list --name <swa-name> --query "properties.apiKey" -o tsv)
-swa deploy <output-dir> --deployment-token $TOKEN --env production
-```
-
----
-
-## WORKFLOW_DOMAIN
-
-### List Domains
-
-```
-az staticwebapp hostname list --name <swa-name> -o table
-```
-
-### Register Custom Domain
-
-```
-1. Verify DNS CNAME:
-   dig +short <hostname> CNAME
-   Expected: <swa-default-hostname>.
-
-2. Register:
-   az staticwebapp hostname set --name <swa-name> --hostname <hostname>
-   (blocks until validation + SSL certificate issued)
-
-3. Verify SSL:
-   curl -v https://<hostname> 2>&1 | grep -E "SSL|subject|issuer|certificate"
-```
-
-### Check SSL Status
-
-```
-az staticwebapp hostname list --name <swa-name> --query "[].{domain:domainName, status:status}" -o table
-```
-
----
-
-## WORKFLOW_RBAC
-
-### List Assignments
-
-```
-SCOPE="/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Web/staticSites/<swa-name>"
-mcp__azure__role(command: "role_assignment_list", parameters: {scope: SCOPE, subscription: <sub>})
-```
-
-### Grant Access
-
-```
-1. Identify principalId:
-   az ad user show --id <email> --query "id" -o tsv
-
-2. Assign role:
-   az role assignment create \
-     --assignee <principalId> \
-     --role "Contributor" \
-     --scope "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Web/staticSites/<swa-name>"
-
-3. Confirm: "Granted {user} Contributor role on {swa-name}"
-```
-
-**Scope note**: `Microsoft.Web/staticSites` ≠ `Microsoft.Web/sites`. App Service RBAC does NOT apply to SWA.
-
----
-
-## CONVENTIONS
-
-- SWA resource naming: `swa-{app}-client` (production), `swa-{app}-client-testbed` (testbed)
-- swa-cli.config.json: `appBuildCommand: ""` (separate build/deploy), `appName` + `resourceGroup` required (prevents interactive prompt)
-- GitHub Actions workflow naming: `{default-branch}_swa_{app}.yml`
-- GitHub Secret: `AZURE_STATIC_WEB_APPS_API_TOKEN`
-- staticwebapp.config.json: located at project root, `globalHeaders: no-cache` inversion strategy required
-
----
-
-## CONSTRAINTS
-
-- Use SWA CLI (`swa deploy`) — `az staticwebapp deploy` command does NOT exist
-- **`--env production` REQUIRED**: `swa deploy` defaults to `preview` environment. Custom domains bind to production only
-- **`.env` write-back caution**: `swa login`/`swa deploy` writes Azure credentials to project `.env`. If `.env` is git-tracked, run `git checkout .env` after deploy
-- **`staticwebapp.config.json` auto-included**: SWA CLI auto-detects config at `appLocation` root — no manual copy needed. Only GitHub Actions (`skip_app_build: true`) requires explicit copy step
-- VS Code SWA Extension: resource management only, no deploy capability (requires GitHub Actions)
-- Azure Portal: no direct file upload UI
-- SWA Free tier: includes custom domain + SSL, no PR Preview (auth constraint)
-- Deployment token: unique per SWA resource
-
----
-
-## ERROR_HANDLING
-
-| Error | Action |
-|-------|--------|
-| `swa --version` fails | Suggest `npm install -g @azure/static-web-apps-cli` |
-| `swa deploy` auth failure | Use `swa login` or `--deployment-token` |
-| DNS CNAME mismatch | Compare `dig +short` result with SWA defaultHostname, suggest DNS fix |
-| SSL "Adding" status persists | Azure Managed Certificate issuance up to 10min, suggest polling |
-| `staticwebapp.config.json` not applied | SWA CLI auto-includes from `appLocation`. GitHub Actions (`skip_app_build: true`) requires copy to `dist/` |
-
----
-
-**Version**: 1.1.0
-**Created**: 2026-03-11
+- 현재 프로젝트 매핑이 있는데도 임의의 다른 SWA 토큰을 사용하지 않는다.
+- `az staticwebapp deploy`가 있다고 가정하지 않는다.
+- `--env production` 없이 운영 반영을 기대하지 않는다.
+- DNS 검증 없이 커스텀 도메인 등록을 강행하지 않는다.
+- App Service용 RBAC 범위를 SWA 리소스에 그대로 적용하지 않는다.
+- `.env` 변경 가능성을 무시한 채 배포를 끝내지 않는다.

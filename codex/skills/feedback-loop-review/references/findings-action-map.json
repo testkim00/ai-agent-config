@@ -1,0 +1,80 @@
+{
+  "validation_missing_high_risk": {
+    "priority": "P1",
+    "title": "Validation missing on a high-risk turn",
+    "target": "skill",
+    "action_type": "add_validation_gate",
+    "suggested_action": "Add a minimum validation checklist to the relevant implementation, bugfix, refactor, or ops skill and remind the agent to run it before stopping.",
+    "impact": "Regression risk stays high because the turn ended without a visible safety check.",
+    "confidence": 0.95,
+    "secondary_targets": [
+      "hook",
+      "checklist"
+    ]
+  },
+  "failed_validation_at_stop": {
+    "priority": "P1",
+    "title": "Turn stopped after failed validation",
+    "target": "hook",
+    "action_type": "strengthen_stop_gate",
+    "suggested_action": "Strengthen stop-stage guidance or hook behavior so failed validation triggers one more debugging pass instead of a normal stop.",
+    "impact": "The loop is terminating while known errors remain unresolved.",
+    "confidence": 0.94,
+    "secondary_targets": [
+      "skill",
+      "agent"
+    ]
+  },
+  "repeated_failed_command": {
+    "priority": "P1",
+    "title": "Same failing command repeated without a meaningful pivot",
+    "target": "agent",
+    "action_type": "teach_failure_pivot",
+    "suggested_action": "Teach a pivot rule: after the second identical failure, inspect artifacts, shrink scope, or change strategy before retrying again.",
+    "impact": "Tokens and time are being burned on a loop that is not generating new information.",
+    "confidence": 0.93,
+    "secondary_targets": [
+      "skill",
+      "prompt"
+    ]
+  },
+  "low_focus_command_sprawl": {
+    "priority": "P2",
+    "title": "Command flow sprawled beyond a tight working set",
+    "target": "prompt",
+    "action_type": "tighten_scope_prompting",
+    "suggested_action": "Add a narrowing step to the prompt or skill so the agent identifies the next proof point before issuing many new commands.",
+    "impact": "The workflow loses focus and becomes harder to reason about or reproduce.",
+    "confidence": 0.76,
+    "secondary_targets": [
+      "skill",
+      "checklist"
+    ]
+  },
+  "weak_recovery_after_failure": {
+    "priority": "P2",
+    "title": "Failure handling was present but weak",
+    "target": "skill",
+    "action_type": "add_failure_triage_sequence",
+    "suggested_action": "Add a failure triage sequence to the relevant skill: inspect error, isolate scope, choose the smallest next verification, then retry.",
+    "impact": "Failures are acknowledged, but the next step is not disciplined enough to improve confidence quickly.",
+    "confidence": 0.82,
+    "secondary_targets": [
+      "agent",
+      "prompt"
+    ]
+  },
+  "automation_candidate_repeated_workflow": {
+    "priority": "P3",
+    "title": "Workflow looks repetitive enough to standardize",
+    "target": "script",
+    "action_type": "extract_reusable_command",
+    "suggested_action": "Extract the repeated sequence into a reusable script, command alias, or checklist and reference it from the relevant skill.",
+    "impact": "Repeated manual work is consuming attention that could be removed with a small standardization step.",
+    "confidence": 0.79,
+    "secondary_targets": [
+      "skill",
+      "checklist"
+    ]
+  }
+}

@@ -1,94 +1,34 @@
 # Executor Template
 
-명령 실행용 subagent 템플릿 (git, shell 등)
+분리 가능한 구현 작업을 worker에게 맡길 때 쓰는 brief 템플릿이다.
 
-## 템플릿
+## 권장 brief
 
-```python
-Task(
-    subagent_type="Bash",
-    model="sonnet",  # config.md 참조
-    prompt="""
-    {작업명} 실행:
-
-    [실행할 명령]:
-    - {command1}
-    - {command2}
-
-    [처리 단계]:
-    1. 사전 조건 확인
-       - {precondition}
-
-    2. 명령 실행
-       - {main_command}
-
-    3. 결과 확인
-       - {verification}
-
-    [출력]:
-    - 성공/실패 여부
-    - 실행 결과 요약
-    - 오류 시 에러 메시지
-    """
-)
+```text
+담당 범위: {파일/모듈}
+목표: {구현 목표}
+배경:
+- {필요한 최소 맥락}
+제약:
+- 당신은 코드베이스에 혼자가 아니다
+- 다른 변경을 되돌리지 말 것
+- 담당 범위를 벗어난 수정은 최소화할 것
+검증:
+- {테스트/빌드/린트/정적 확인}
+최종 보고:
+- 변경 파일
+- 핵심 변경
+- 검증 결과
 ```
 
-## 사용 예시
+## 좋은 위임 예
 
-### Git 커밋
+- 서로 다른 모듈의 테스트 고치기
+- 명확히 분리된 파일 세트 리팩터링
+- 긴 로그 분석과 구현 작업의 병행
 
-```python
-Task(
-    subagent_type="Bash",
-    model="sonnet",
-    prompt="""
-    Git 커밋 작업:
+## 나쁜 위임 예
 
-    [변경사항]: {staged_files}
-
-    [처리 단계]:
-    1. 변경사항 상세 확인
-       - git diff --staged
-
-    2. 커밋 메시지 생성
-       - conventional commit 형식
-       - 한국어로 작성
-
-    3. 커밋 실행
-       - git commit -m "{message}"
-
-    4. 결과 확인
-       - git log -1
-
-    [출력]:
-    - 커밋 해시
-    - 커밋 메시지
-    """
-)
-```
-
-### Shell 명령
-
-```python
-Task(
-    subagent_type="Bash",
-    model="sonnet",
-    prompt="""
-    빌드 실행:
-
-    [처리 단계]:
-    1. 의존성 설치
-       - npm install
-
-    2. 빌드 실행
-       - npm run build
-
-    3. 결과 확인
-       - 빌드 산출물 확인
-
-    [출력]:
-    - 빌드 성공/실패
-    - 에러 시 에러 내용
-    """
-)
-```
+- 같은 파일을 두 worker에 나누기
+- 설계 결론이 안 난 상태에서 구현을 병렬 시작하기
+- 메인 에이전트가 바로 직접 고칠 수 있는 소규모 수정

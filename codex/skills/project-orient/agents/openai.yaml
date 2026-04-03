@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Orient"
+  short_description: "새 세션에서 프로젝트 구조와 진입점을 빠르게 재구성"
+  default_prompt: "Use $project-orient to brief me on the repository structure, entry points, run commands, and editing cautions."

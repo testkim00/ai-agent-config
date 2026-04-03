@@ -1,0 +1,170 @@
+{
+  "validation_missing_high_risk": {
+    "summary": "Add a stronger minimum validation gate for high-risk work.",
+    "implementation_notes": [
+      "Preserve existing log capture while making missing validation harder to ignore.",
+      "Prefer a small checklist or skill update before introducing heavy automation.",
+      "If enforcement is added in hooks, keep it advisory-first unless the pattern is chronic."
+    ],
+    "default_candidates": {
+      "hook": [
+        {
+          "path": "~/.codex/hooks/_feedback_core.py",
+          "mode": "edit",
+          "reason": "Validation classification and turn-level evidence already live here."
+        },
+        {
+          "path": "~/.codex/hooks.json",
+          "mode": "edit",
+          "reason": "Hook wiring and event coverage live here."
+        }
+      ],
+      "skill": [
+        {
+          "path": "/Users/honeychaser/Projects/ai-agent-config/codex/skills/codex/SKILL.md",
+          "mode": "edit",
+          "reason": "This is the broad fallback skill for general execution behavior."
+        }
+      ],
+      "checklist": [
+        {
+          "path": "~/.codex/checklists/high-risk-validation.md",
+          "mode": "create",
+          "reason": "A checklist is the smallest reusable guardrail for repeated misses."
+        }
+      ]
+    },
+    "apply_prompt_template": "Patch the validation guidance so high-risk turns do not end without at least one relevant verification step. Preserve existing JSONL logging and keep the change minimal."
+  },
+  "failed_validation_at_stop": {
+    "summary": "Prevent a normal stop after failed validation on a high-risk turn.",
+    "implementation_notes": [
+      "Focus first on the stop-stage decision path.",
+      "Use the recent turn evidence rather than only the last assistant message.",
+      "Prefer continuing the turn with a repair prompt over silently logging the failure."
+    ],
+    "default_candidates": {
+      "hook": [
+        {
+          "path": "~/.codex/hooks/_feedback_core.py",
+          "mode": "edit",
+          "reason": "Stop-hook logic and turn-level event interpretation live here."
+        },
+        {
+          "path": "~/.codex/hooks/stop.sh",
+          "mode": "edit",
+          "reason": "This is the stop-hook entry point."
+        },
+        {
+          "path": "~/.codex/hooks.json",
+          "mode": "edit",
+          "reason": "Hook configuration may need to stay aligned with stop behavior changes."
+        }
+      ]
+    },
+    "apply_prompt_template": "Patch the local stop-hook flow so turns with failed validation do not terminate normally. Continue the turn with a concise repair prompt and keep the existing feedback-loop logging intact."
+  },
+  "repeated_failed_command": {
+    "summary": "Teach a stronger pivot rule after repeated command failures.",
+    "implementation_notes": [
+      "After the second identical failure, force an inspect-or-narrow pivot instead of another blind retry.",
+      "Prefer agent or skill guidance over hard blocking unless the command is dangerous.",
+      "Use the failed command text as evidence in the guidance."
+    ],
+    "default_candidates": {
+      "agent": [
+        {
+          "path": "/Users/honeychaser/Projects/ai-agent-config/codex/skills/codex/SKILL.md",
+          "mode": "edit",
+          "reason": "This is the broadest place to teach a general pivot rule."
+        },
+        {
+          "path": "/Users/honeychaser/Projects/ai-agent-config/codex/AGENTS.md",
+          "mode": "edit",
+          "reason": "Global execution guidance can reinforce the same rule."
+        }
+      ],
+      "prompt": [
+        {
+          "path": "/Users/honeychaser/Projects/ai-agent-config/codex/skills/codex/SKILL.md",
+          "mode": "edit",
+          "reason": "Prompt-level execution guidance is often best stored in the general Codex skill."
+        }
+      ]
+    },
+    "apply_prompt_template": "Patch the general execution guidance so the agent pivots after the second identical command failure instead of retrying the same command again. Use inspect, scope reduction, or targeted validation as the required next move."
+  },
+  "low_focus_command_sprawl": {
+    "summary": "Tighten scope before issuing many new commands.",
+    "implementation_notes": [
+      "Add a narrowing step that chooses the next proof point before more exploration.",
+      "Prefer prompt or skill changes over hook enforcement.",
+      "Keep the guidance short and operational."
+    ],
+    "default_candidates": {
+      "prompt": [
+        {
+          "path": "/Users/honeychaser/Projects/ai-agent-config/codex/skills/codex/SKILL.md",
+          "mode": "edit",
+          "reason": "General execution prompting belongs in the broad Codex skill."
+        }
+      ],
+      "checklist": [
+        {
+          "path": "~/.codex/checklists/scope-narrowing.md",
+          "mode": "create",
+          "reason": "A short reusable checklist can keep exploratory turns tighter."
+        }
+      ]
+    },
+    "apply_prompt_template": "Patch the relevant guidance so exploratory turns choose the next proof point before issuing many new commands. Keep it short and focused on narrowing scope."
+  },
+  "weak_recovery_after_failure": {
+    "summary": "Add a clearer failure-triage sequence.",
+    "implementation_notes": [
+      "Teach a deterministic sequence: inspect error, isolate scope, choose the smallest next validation, then retry.",
+      "Prefer skill guidance because the behavior is procedural.",
+      "Keep the sequence short enough to survive context pressure."
+    ],
+    "default_candidates": {
+      "skill": [
+        {
+          "path": "/Users/honeychaser/Projects/ai-agent-config/codex/skills/codex/SKILL.md",
+          "mode": "edit",
+          "reason": "This is the broad fallback location for execution workflow improvements."
+        },
+        {
+          "path": "/Users/honeychaser/Projects/ai-agent-config/codex/skills/git-workflow/SKILL.md",
+          "mode": "edit",
+          "reason": "This skill often overlaps with iterative debugging and verification flow."
+        }
+      ]
+    },
+    "apply_prompt_template": "Patch the relevant workflow guidance to add a short failure-triage sequence: inspect the error, isolate the scope, choose the smallest next verification, then retry."
+  },
+  "automation_candidate_repeated_workflow": {
+    "summary": "Extract a repeated workflow into a reusable command, script, or checklist.",
+    "implementation_notes": [
+      "Prefer a tiny command wrapper or script before adding a large new system.",
+      "Name the script after the repeated workflow rather than the finding code.",
+      "Reference the new reusable action from the relevant skill."
+    ],
+    "default_candidates": {
+      "script": [
+        {
+          "path": "~/.codex/bin/repeated-workflow.sh",
+          "mode": "create",
+          "reason": "A user-local command is a good first extraction point."
+        }
+      ],
+      "checklist": [
+        {
+          "path": "~/.codex/checklists/repeated-workflow.md",
+          "mode": "create",
+          "reason": "A lightweight checklist may be enough before writing code."
+        }
+      ]
+    },
+    "apply_prompt_template": "Create a small reusable command, script, or checklist for the repeated workflow observed in the report, then reference it from the most relevant skill."
+  }
+}

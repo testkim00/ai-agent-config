@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "enforce": true,
+  "when_turn_types": ["implementation", "bugfix", "refactor", "ops"],
+  "skip_turn_types": ["docs", "analysis", "review"],
+  "require_repo_dirty": true,
+  "required_all": [],
+  "required_any": [
+    "command:(^|\\s)(?:npm|pnpm|yarn|bun)\\s+(?:run\\s+)?build\\b",
+    "tag:build"
+  ],
+  "override_phrase": "HARNESS_SKIP:",
+  "consistency_check": {
+    "enabled": true,
+    "profile": "frontend-screen",
+    "summary": "Frontend 화면 repo에서는 기존 page shell, layout, shared component, list/form 패턴을 먼저 맞춘다.",
+    "applies_to": [
+      "src/**/*.vue",
+      "src/**/*.tsx",
+      "src/**/*.jsx",
+      "src/**/*.ts",
+      "src/**/*.js",
+      "src/**/*.scss",
+      "src/**/*.sass",
+      "src/**/*.css",
+      "pages/**/*.vue",
+      "pages/**/*.tsx",
+      "components/**/*.vue",
+      "components/**/*.tsx"
+    ],
+    "reference_expectation": "최종 보고에서 참고한 기존 화면/컴포넌트 2~3개와 재사용한 wrapper/layout/component/module을 짧게 남긴다.",
+    "required_checklist": [
+      "같은 계열 기존 화면(혹은 API) 2~3개를 reference로 잡았는지",
+      "최대한 기존의 공통 wrapper/layout/component/module 등을 활용하는지",
+      "inline color, inline spacing, local-only radius 같은 임의 스타일을 넣지 않았는지",
+      "(shared) component import 패턴이 기존과 맞는지",
+      "grid/list/form 화면별로 정해둔 기본 구조를 벗어났는지"
+    ],
+    "project_notes": [
+      "같은 메뉴군의 기존 page, popup, table, form 2~3개를 먼저 읽고 header/search/filter/body 배치를 최대한 맞춘다.",
+      "공통 page shell, dialog wrapper, form/grid component, shared module이 있으면 새 마크업보다 기존 조합을 우선한다.",
+      "새 화면을 만들더라도 spacing, color token, radius, import 순서, section naming은 인접한 기존 화면의 패턴을 그대로 따른다."
+    ]
+  }
+}

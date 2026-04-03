@@ -16,6 +16,8 @@ description: 현재 브랜치를 원격에 push할 때 사용한다. Claude의 `
 
 ## 기본 규칙
 
+- git 대상 저장소는 항상 현재 작업 디렉터리(`cwd`)의 Git 저장소다.
+- 참조한 스킬 파일이나 다른 로컬 저장소가 있어도, 명시 요청이 없으면 git 작업 대상은 바꾸지 않는다.
 - 기본 원격은 `origin`으로 본다.
 - uncommitted change가 있으면 먼저 커밋할지 확인한다.
 - 현재 브랜치가 `main`/`master`면 경고하고 확인을 받는다.
@@ -41,4 +43,3 @@ description: 현재 브랜치를 원격에 push할 때 사용한다. Claude의 `
 
 - 자동 force push
 - unrelated change까지 묶어서 임의 커밋 후 push
-

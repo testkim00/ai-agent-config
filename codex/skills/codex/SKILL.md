@@ -20,6 +20,9 @@ description: Claude command `/codex` 대응 스킬. Claude의 `/codex` 명령을
 - source command의 의도를 유지한다.
 - Claude 전용 구문인 `allowed-tools`, `Task`, `AskUserQuestion`은 Codex 실행 환경에 맞게 해석한다.
 - 사용자가 같은 동작을 요청하면 아래 source workflow를 기준으로 수행한다.
+- 구현, 버그 수정, 리팩터링, 배포/운영 작업은 종료 전에 변경과 직접 연결된 검증을 최소 1개 실행한다.
+- `git_ok`, 단순 파일 읽기, 무관한 상태 확인처럼 변경 결과를 증명하지 못하는 명령은 검증으로 간주하지 않는다.
+- 검증이 불가능하면 실행하지 못한 이유와 남은 리스크를 최종 응답에 분명히 남긴다.
 
 ## source workflow
 

@@ -133,6 +133,6 @@ skill_internals:
 
 ### 추가 규칙
 
-- `_relations.yaml` 변경 후 자동으로 git commit
+- `_relations.yaml` 변경만을 이유로 자동 commit하지 않는다. commit은 사용자가 명시적으로 요청한 경우에만 수행한다.
 - 대폭 변경(5개+ 항목) 시 사용자 확인
 - validate 모드는 수정 없이 검증만 수행

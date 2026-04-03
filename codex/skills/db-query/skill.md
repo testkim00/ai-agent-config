@@ -46,3 +46,4 @@ python3 query.py "{PREFIX}" "{SQL}"
 
 - This skill supports both direct query output and template-based export flows.
 - If DB access is blocked by the environment, state that clearly and do not pretend the query ran.
+- Risky SQL writes are hook-gated. If the query contains `INSERT`, `UPDATE`, `DELETE`, `MERGE`, `TRUNCATE`, DDL, `EXEC`, `CALL`, or runs a `.sql` script, the user must explicitly approve it in the prompt with `SQL_WRITE_OK: <db/reason>` before execution.

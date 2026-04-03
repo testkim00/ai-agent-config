@@ -261,6 +261,14 @@ Skip this step only if the skill being developed already exists, and iteration o
 
 When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires, making the skill creation process much more efficient and reliable.
 
+When creating, renaming, or deleting a skill inside `/Users/honeychaser/Projects/ai-agent-config/codex`, always update `/Users/honeychaser/Projects/ai-agent-config/codex/_relations.yaml` in the same change. Add or adjust:
+
+- `relations` for the skill family and any upstream Claude command mapping
+- `skill_internals` for bundled files such as `scripts/`, `references/`, `agents/`, or templates
+- `shared_files` or `global` if the new skill introduces shared documents
+
+Do not treat skill creation as complete until the relation index is updated.
+
 Usage:
 
 ```bash
@@ -275,6 +283,8 @@ The script:
 - Adds example files in each directory that can be customized or deleted
 
 After initialization, customize or remove the generated SKILL.md and example files as needed.
+
+If the skill is being added under `/Users/honeychaser/Projects/ai-agent-config/codex/skills`, update `/Users/honeychaser/Projects/ai-agent-config/codex/_relations.yaml` before finishing.
 
 ### Step 4: Edit the Skill
 

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.codex/feedback-loop/apply-plan.schema.json",
+  "title": "Feedback Loop Apply Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "source_summary",
+    "selected_proposal",
+    "feedback_context",
+    "next_actions",
+    "validation_hints"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "feedback-loop-apply-plan/v1"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "source_summary": {
+      "type": "object"
+    },
+    "selected_proposal": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "feedback_context": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validation_hints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feedback Loop Review"
+  short_description: "Codex 로그를 평가해 개선 백로그로 변환"
+  default_prompt: "Use $feedback-loop-review to analyze recent Codex hook logs, score the turns, and propose the next skill, hook, or agent improvements."

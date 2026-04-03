@@ -1,0 +1,147 @@
+# Codex 스킬-커맨드-문서 관계 정의
+#
+# Codex 스킬 또는 관련 커맨드 수정 시 이 파일을 참조하여 관련 스킬, upstream Claude command,
+# 공용 문서, 스킬 내부 파일을 함께 확인/수정한다.
+#
+# 사용법:
+#   1. 스킬 또는 커맨드 수정 시 → 연결된 skills와 commands 확인
+#   2. 스킬 또는 커맨드 생성/삭제/이름 변경 시 → 이 파일도 함께 갱신
+#   3. 다중 파일 스킬 수정 시 → skill_internals에 정의된 내부 파일 확인
+
+relations:
+  - commands: ["../claude/commands/git/*.md"]
+    skills: ["git-pr", "git-save", "git-push", "git-switch", "git-sync", "git-cleanup", "git-workflow", "git-convention"]
+    description: "Git workflow, sync, branch/commit convention"
+
+  - commands: []
+    skills: ["git-monthly-report"]
+    description: "Git activity reporting"
+
+  - commands: ["../claude/commands/az/swa.md"]
+    skills: ["az-swa"]
+    description: "Azure Static Web Apps 운영/배포"
+
+  - commands: []
+    skills: ["az-app"]
+    description: "Azure App Service 운영/배포"
+
+  - commands: []
+    skills: ["az-db"]
+    description: "Azure DB inventory/usage 조회"
+
+  - commands: ["../claude/commands/db/*.md"]
+    skills: ["db-query", "db-convert"]
+    description: "DB query, schema, conversion"
+
+  - commands: ["../claude/commands/env/*.md"]
+    skills: ["env-add", "env-list", "env-remove", "env-sync"]
+    description: "환경변수 등록/조회/삭제/동기화"
+
+  - commands: ["../claude/commands/config/*.md"]
+    skills: ["config-push", "config-sync", "skill-sync"]
+    description: "설정 동기화와 Claude↔Codex 매핑 유지"
+
+  - commands: ["../claude/commands/orchestration.md", "../claude/commands/analyze/orchestration.md"]
+    skills: ["orchestration", "analyze-orchestration", "subagent-convention"]
+    description: "작업 구조화, delegation 규칙, orchestration 회고"
+
+  - commands: ["../claude/commands/codex.md", "../claude/commands/consult.md", "../claude/commands/fix-encoding.md"]
+    skills: ["codex", "consult", "fix-encoding"]
+    description: "독립 helper command 대응 스킬"
+
+  - commands: ["../claude/commands/dooray/*.md"]
+    skills: ["dooray-messenger"]
+    description: "Dooray 메신저 연동"
+
+  - commands: []
+    skills: ["dooray"]
+    description: "Legacy Dooray local skill reference"
+
+  - commands: ["../claude/commands/project/*.md"]
+    skills: ["project-define", "project-memo", "project-new", "project-structure"]
+    description: "프로젝트 등록/생성/메모/구조 문서화"
+
+  - commands: []
+    skills: ["project-orient", "migration"]
+    description: "프로젝트 파악과 구현 준비용 마이그레이션 분석"
+
+  - commands: ["../claude/commands/shared/*.md"]
+    skills: ["shared-init", "shared-pull", "shared-push"]
+    description: "공유 모듈 subtree 작업"
+
+  - commands: ["../claude/commands/tidy/*.md"]
+    skills: ["tidy-md", "tidy-meta"]
+    description: "문서/메타 정리"
+
+  - commands: []
+    skills: ["feedback-loop", "feedback-loop-review", "feedback-loop-apply", "harness"]
+    description: "feedback loop, harness, 작업 품질 개선"
+
+shared_files:
+  tidy:
+    - "../claude/commands/tidy/_common.md"
+
+  subagent-convention:
+    - "skills/subagent-convention/_index.md"
+
+global:
+  - "AGENTS.md"
+  - "_relations.yaml"
+  - "../README.md"
+
+skill_internals:
+  subagent-convention:
+    - "_index.md"
+    - "instruction.md"
+    - "config.md"
+    - "templates/*.md"
+
+  db-query:
+    - "SKILL.md"
+    - "databases.md"
+    - "templates.md"
+    - "schema/*.md"
+    - "query.py"
+
+  git-sync:
+    - "SKILL.md"
+    - "scripts/sync_all_branches.py"
+
+  az-app:
+    - "SKILL.md"
+    - "references/project-map.md"
+
+  az-db:
+    - "SKILL.md"
+    - "references/db-map.md"
+
+  dooray:
+    - "skill.md"
+
+  feedback-loop:
+    - "SKILL.md"
+
+  feedback-loop-review:
+    - "SKILL.md"
+    - "agents/*.yaml"
+    - "scripts/*.py"
+    - "references/*.md"
+    - "references/*.json"
+
+  feedback-loop-apply:
+    - "SKILL.md"
+    - "agents/*.yaml"
+    - "scripts/*.py"
+    - "references/*.json"
+
+  git-convention:
+    - "SKILL.md"
+
+  project-structure:
+    - "SKILL.md"
+
+  migration:
+    - "SKILL.md"
+
+  skill-sync:
+    - "SKILL.md"

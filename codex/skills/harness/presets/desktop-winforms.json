@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "enforce": true,
+  "when_turn_types": ["implementation", "bugfix", "refactor", "ops"],
+  "skip_turn_types": ["docs", "analysis", "review"],
+  "require_repo_dirty": true,
+  "required_all": [],
+  "required_any": [
+    "command:(^|\\s)msbuild\\b",
+    "command:(^|\\s)xbuild\\b",
+    "command:(^|\\s)(?:devenv|devenv\\.com)\\b.*\\b/build\\b"
+  ],
+  "unsupported_platforms": ["darwin"],
+  "unsupported_platform_reason": "Legacy WinForms/.NET Framework desktop builds are not supported on macOS in this local Codex setup. Do the build validation on Windows or document the limitation explicitly.",
+  "override_phrase": "HARNESS_SKIP:",
+  "consistency_check": {
+    "enabled": true,
+    "profile": "desktop-winforms",
+    "summary": "Legacy WinForms/desktop repo에서는 기존 Form, Designer, BaseForm, popup, grid 배치를 먼저 맞춘다.",
+    "applies_to": [
+      "**/*.cs",
+      "**/*.Designer.cs",
+      "**/*.resx",
+      "**/*.csproj"
+    ],
+    "reference_expectation": "최종 보고에서 참고한 기존 Form/popup/base form 2~3개와 재사용한 공통 control/helper/module을 짧게 남긴다.",
+    "required_checklist": [
+      "같은 계열 기존 화면(혹은 API) 2~3개를 reference로 잡았는지",
+      "최대한 기존의 공통 wrapper/layout/component/module 등을 활용하는지",
+      "inline color, inline spacing, local-only radius 같은 임의 스타일을 넣지 않았는지",
+      "(shared) component import 패턴이 기존과 맞는지",
+      "grid/list/form 화면별로 정해둔 기본 구조를 벗어났는지"
+    ],
+    "project_notes": [
+      "이 repo에서는 API보다 Form, Designer, BaseForm, UserControl, DevExpress grid/layout 패턴이 일관한지가 더 중요하다.",
+      "공통 ChildForm/BaseForm, popup shell, grid/search panel, helper module이 있으면 새 화면보다 기존 조합을 우선한다.",
+      "새 WinForms 화면을 만들더라도 docking, padding, control naming, event wiring, designer resource 배치는 인접한 기존 화면 패턴을 그대로 따른다."
+    ]
+  }
+}

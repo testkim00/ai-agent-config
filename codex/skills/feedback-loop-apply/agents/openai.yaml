@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feedback Loop Apply"
+  short_description: "가장 안전한 feedback proposal 1개를 실제 반영"
+  default_prompt: "Use $feedback-loop-apply to select one safe feedback proposal, tag the run, patch the local Codex config or skill files, run a targeted recheck, and clear the feedback context."

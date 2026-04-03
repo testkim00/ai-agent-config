@@ -1,103 +1,35 @@
 # API Caller Template
 
-API 호출용 subagent 템플릿 (REST, DB 쿼리)
+외부 API 호출이나 DB 조회를 하위 에이전트에 맡겨야 할 때 쓰는 brief 템플릿이다.
 
-## 템플릿
+기본 원칙:
 
-```python
-Task(
-    subagent_type="Bash",
-    model="sonnet",  # config.md 참조
-    prompt="""
-    {작업명} API 호출:
+- 사용자 요청 없이 네트워크 작업을 위해 하위 에이전트를 기본 사용하지 않는다.
+- 메인 에이전트가 직접 할 수 있으면 직접 한다.
+- 위임한다면 입력, 인증 방식, 출력 형식을 매우 좁게 적는다.
 
-    [API 정보]:
-    - 엔드포인트: {endpoint}
-    - 메서드: {method}
-    - 인증: {auth_type}
+## 권장 brief
 
-    [요청 데이터]:
-    {request_body}
-
-    [처리 단계]:
-    1. 인증 정보 로드
-       - {env_file}에서 토큰 읽기
-
-    2. API 호출
-       - Python urllib 사용
-       - 헤더 설정
-
-    3. 응답 처리
-       - 상태 코드 확인
-       - 응답 데이터 파싱
-
-    [출력]:
-    - API 응답 결과
-    - 성공/실패 여부
-    - 에러 시 에러 메시지
-    """
-)
+```text
+담당 범위: {API 호출 또는 DB 조회 한 건}
+목표: {무엇을 조회/전송할지}
+입력:
+- endpoint/query: {값}
+- method: {값}
+- auth source: {env 또는 설정 위치}
+출력:
+- 핵심 결과
+- 성공/실패 여부
+- 에러 원인
+제약:
+- 범위를 넓히지 말 것
+- 쓰기 작업이면 실제 전송/수정 전 조건을 다시 확인할 것
+검증:
+- 상태 코드 또는 결과 건수 확인
 ```
 
-## 사용 예시
+## 주의사항
 
-### REST API 호출
-
-```python
-Task(
-    subagent_type="Bash",
-    model="sonnet",
-    prompt="""
-    두레이 메시지 전송:
-
-    [API 정보]:
-    - 엔드포인트: https://api.dooray.com/messenger/v1/channels/direct-send
-    - 메서드: POST
-    - 인증: dooray-api {token}
-
-    [요청 데이터]:
-    - organizationMemberId: {member_id}
-    - text: {message}
-
-    [처리 단계]:
-    1. ~/.claude/.env에서 DOORAY_API_TOKEN 로드
-    2. 수신자 정보 조회 (본사직원.json)
-    3. API 호출
-    4. 응답 확인
-
-    [출력]:
-    - 전송 성공/실패
-    - 수신자 정보
-    """
-)
-```
-
-### DB 쿼리
-
-```python
-Task(
-    subagent_type="Bash",
-    model="sonnet",
-    prompt="""
-    DB 쿼리 실행:
-
-    [쿼리]:
-    {sql_query}
-
-    [출력 형식]: {xlsx/json/console}
-    [출력 경로]: {output_path}
-
-    [처리 단계]:
-    1. DB 연결 정보 로드
-    2. 쿼리 실행 (query.py 사용)
-    3. 결과 처리
-       - 파일 출력 시 저장
-       - 콘솔 출력 시 포맷팅
-
-    [출력]:
-    - 조회 건수
-    - 출력 파일 경로 (있는 경우)
-    - 에러 시 에러 메시지
-    """
-)
-```
+- API 호출은 재시도 비용과 부작용을 먼저 본다.
+- DB 작업은 읽기와 쓰기를 엄격히 구분한다.
+- 네트워크 권한이나 인증 정보가 없으면 추정하지 말고 바로 보고한다.

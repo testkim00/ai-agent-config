@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Monthly Report"
+  short_description: "Draft monthly achievements from multi-repo Git activity"
+  default_prompt: "Use $git-monthly-report to collect Git activity from selected repositories and draft a monthly achievements report."

@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "enforce": true,
+  "when_turn_types": ["implementation", "bugfix", "refactor", "ops"],
+  "skip_turn_types": ["docs", "analysis", "review"],
+  "require_repo_dirty": true,
+  "required_all": [],
+  "required_any": [
+    "command:(^|\\s)go\\s+test\\b",
+    "command:(^|\\s)go\\s+build\\b"
+  ],
+  "override_phrase": "HARNESS_SKIP:",
+  "consistency_check": {
+    "enabled": true,
+    "profile": "backend-api",
+    "summary": "Go 서비스 repo에서는 기존 handler/service/module 경계와 request/response 흐름을 먼저 맞춘다.",
+    "applies_to": [
+      "**/*.go",
+      "**/*.json",
+      "**/*.yml",
+      "**/*.yaml"
+    ],
+    "reference_expectation": "최종 보고에서 참고한 기존 handler/service/module 2~3개와 따라간 naming/boundary 규칙을 짧게 남긴다.",
+    "required_checklist": [
+      "같은 계열 기존 화면(혹은 API) 2~3개를 reference로 잡았는지",
+      "최대한 기존의 공통 wrapper/layout/component/module 등을 활용하는지",
+      "inline color, inline spacing, local-only radius 같은 임의 스타일을 넣지 않았는지",
+      "(shared) component import 패턴이 기존과 맞는지",
+      "grid/list/form 화면별로 정해둔 기본 구조를 벗어났는지"
+    ],
+    "project_notes": [
+      "이 repo에서는 화면보다 handler/service/repository/module 경계와 request/response DTO 패턴이 일관한지가 더 중요하다.",
+      "공통 middleware, helper, mapper, module wiring이 있으면 새 구조보다 기존 조합을 우선한다.",
+      "UI 관련 체크 항목은 web/admin 자산을 실제로 수정할 때만 직접 적용하고, 그 외에는 API 흐름과 endpoint/module 구조에 대응시켜 해석한다."
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feedback Loop"
+  short_description: "review와 apply를 하나의 상위 흐름으로 묶음"
+  default_prompt: "Use $feedback-loop to review recent baseline hook logs, generate improvement proposals, prepare one safe apply plan, and optionally activate a tagged feedback cycle for the next patch."

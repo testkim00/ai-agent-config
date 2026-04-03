@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "enforce": true,
+  "when_turn_types": ["implementation", "bugfix", "refactor", "ops"],
+  "skip_turn_types": ["docs", "analysis", "review"],
+  "require_repo_dirty": true,
+  "required_all": [],
+  "required_any": [
+    "tag:check"
+  ],
+  "override_phrase": "HARNESS_SKIP:",
+  "consistency_check": {
+    "enabled": true,
+    "profile": "general-module",
+    "summary": "공통 module/config 중심 repo에서는 기존 디렉터리 배치와 module 책임 분리를 먼저 맞춘다.",
+    "applies_to": [
+      "**/*"
+    ],
+    "reference_expectation": "최종 보고에서 참고한 기존 구현 2~3개와 재사용한 공통 module/helper를 짧게 남긴다.",
+    "required_checklist": [
+      "같은 계열 기존 화면(혹은 API) 2~3개를 reference로 잡았는지",
+      "최대한 기존의 공통 wrapper/layout/component/module 등을 활용하는지",
+      "inline color, inline spacing, local-only radius 같은 임의 스타일을 넣지 않았는지",
+      "(shared) component import 패턴이 기존과 맞는지",
+      "grid/list/form 화면별로 정해둔 기본 구조를 벗어났는지"
+    ],
+    "project_notes": [
+      "변경 경로와 가장 가까운 기존 구현 2~3개를 먼저 기준으로 잡고 naming, layout, module 배치를 맞춘다.",
+      "공통 helper, wrapper, template, module이 있으면 새 구조보다 기존 조합을 우선한다.",
+      "UI 관련 체크 항목은 실제 화면 자산을 수정할 때만 직접 적용하고, 그 외에는 list/detail/update 흐름과 module 구조에 대응시켜 해석한다."
+    ]
+  }
+}

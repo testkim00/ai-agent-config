@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "enforce": true,
+  "when_turn_types": ["implementation", "bugfix", "refactor", "ops"],
+  "skip_turn_types": ["docs", "analysis", "review"],
+  "require_repo_dirty": true,
+  "required_all": [],
+  "required_any": [
+    "command:(^|\\s)(?:ba)?sh\\s+-n\\b"
+  ],
+  "override_phrase": "HARNESS_SKIP:",
+  "consistency_check": {
+    "enabled": false,
+    "profile": null,
+    "summary": null,
+    "applies_to": [],
+    "reference_expectation": null,
+    "required_checklist": [],
+    "project_notes": []
+  }
+}
